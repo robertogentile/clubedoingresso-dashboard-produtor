@@ -1,10 +1,10 @@
-import { Sidebar, Header, Button } from "@/components";
+import { Button } from "@/components";
 
 export default function DashboardPage() {
   return (
     <main className="p-8">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-6">Dashboard</h2>
+        <h2 className="text-3xl font-bold text-primary mb-6">Dashboard</h2>
 
         {/* Filtros */}
         <div className="mb-6">

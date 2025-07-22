@@ -1,7 +1,14 @@
 import { ButtonHTMLAttributes, ReactNode } from "react";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost";
+  variant?:
+    | "primary"
+    | "secondary"
+    | "outline"
+    | "ghost"
+    | "danger"
+    | "success"
+    | "muted";
   size?: "sm" | "md" | "lg";
   children: ReactNode;
   className?: string;
@@ -15,16 +22,22 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    "inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
+    "inline-flex items-center justify-center font-medium rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
 
   const variants = {
-    primary: "bg-gray-800 text-white hover:bg-gray-700 focus:ring-gray-500",
+    primary: " hover:bg-primary/90 focus:ring-2 focus:ring-primary",
     secondary:
-      "bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500",
+      "bg-secondary text-white hover:bg-secondary/90 focus:ring-2 focus:ring-secondary",
     outline:
-      "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-gray-500",
-    ghost: "text-gray-700 hover:bg-gray-100 focus:ring-gray-500",
-  };
+      "border border-primary bg-white text-primary hover:bg-primary/5 focus:ring-2 focus:ring-primary",
+    ghost: "text-primary hover:bg-primary/5 focus:ring-2 focus:ring-primary",
+    danger:
+      "bg-danger text-white hover:bg-danger/90 focus:ring-2 focus:ring-danger",
+    success:
+      "bg-success text-white hover:bg-success/90 focus:ring-2 focus:ring-success",
+    muted:
+      "bg-muted text-white hover:bg-muted/90 focus:ring-2 focus:ring-muted",
+  } as const;
 
   const sizes = {
     sm: "px-3 py-1.5 text-sm",

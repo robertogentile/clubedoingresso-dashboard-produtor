@@ -11,7 +11,19 @@ interface TextProps {
     | "body"
     | "caption"
     | "label";
-  color?: "primary" | "secondary" | "success" | "warning" | "error" | "muted";
+  color?:
+    | "primary"
+    | "secondary"
+    | "success"
+    | "warning"
+    | "error"
+    | "muted"
+    | "danger"
+    | "darkBlue"
+    | "gray"
+    | "darkGray"
+    | "white"
+    | "black";
   weight?: "normal" | "medium" | "semibold" | "bold";
   align?: "left" | "center" | "right";
   children: ReactNode;
@@ -41,12 +53,18 @@ export default function Text({
   };
 
   const colors = {
-    primary: "text-gray-900",
-    secondary: "text-gray-700",
-    success: "text-green-600",
-    warning: "text-yellow-600",
-    error: "text-red-600",
-    muted: "text-gray-500",
+    primary: "text-primary",
+    secondary: "text-secondary",
+    success: "text-success",
+    warning: "text-warning",
+    error: "text-error",
+    danger: "text-danger",
+    muted: "text-muted",
+    darkBlue: "text-darkBlue",
+    gray: "text-gray",
+    darkGray: "text-darkGray",
+    white: "text-white",
+    black: "text-black",
   };
 
   const weights = {

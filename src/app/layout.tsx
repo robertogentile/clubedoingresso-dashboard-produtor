@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Montserrat, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+import { QueryProvider, ToastProvider } from "@/components/providers";
+
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
@@ -27,7 +29,10 @@ export default function RootLayout({
       <body
         className={`${montserrat.variable} ${montserratMono.variable} antialiased`}
       >
-        {children}
+        <QueryProvider>
+          <ToastProvider />
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );

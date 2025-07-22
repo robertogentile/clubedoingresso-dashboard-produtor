@@ -1,8 +1,9 @@
+import Image from "next/image";
 interface EventCardProps {
   title: string;
   date: string;
   location: string;
-  status: "active" | "hidden";
+  status: "Ativo" | "Oculto" | "Inativo";
   imageUrl?: string;
   className?: string;
 }
@@ -16,13 +17,17 @@ export default function EventCard({
   className = "",
 }: EventCardProps) {
   const statusConfig = {
-    active: {
+    Ativo: {
       color: "bg-green-500",
       label: "Ativo",
     },
-    hidden: {
+    Oculto: {
       color: "bg-yellow-500",
       label: "Oculto",
+    },
+    Inativo: {
+      color: "bg-gray-500",
+      label: "Inativo",
     },
   };
 
@@ -34,21 +39,16 @@ export default function EventCard({
     >
       {/* Event Image */}
       <div className="h-48 bg-gradient-to-r from-purple-500 to-pink-500 relative overflow-hidden">
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="h-full flex items-center justify-center">
-            <div className="text-white text-center">
-              <div className="text-2xl font-bold mb-2">20 OUT</div>
-              <div className="text-sm mb-1">A Casinha</div>
-              <div className="text-sm">BOTECO</div>
-            </div>
-          </div>
-        )}
+        <Image
+          src={imageUrl || "/placeholder-event.jpg"}
+          alt={title}
+          fill
+          className="w-full h-full object-cover"
+          sizes="100vw"
+          priority
+          placeholder="blur"
+          blurDataURL="/placeholder-event-blur.jpg"
+        />
       </div>
 
       {/* Event Info */}

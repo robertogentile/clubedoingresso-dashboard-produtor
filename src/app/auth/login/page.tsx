@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthLogin } from "@/hooks/api/auth/use-login";
-import Input from "@/components/ui/Input";
+import { Input, Button, Text, Link } from "@/components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
 
@@ -26,6 +26,7 @@ export default function LoginPage() {
     setError("");
     setFieldError({});
     let hasError = false;
+
     if (!validateEmail(email)) {
       setFieldError((prev) => ({ ...prev, email: "E-mail inválido." }));
       hasError = true;
@@ -38,6 +39,7 @@ export default function LoginPage() {
       hasError = true;
     }
     if (hasError) return;
+
     try {
       await loginMutation.mutateAsync({ email, password });
       router.replace("/admin/home");
@@ -51,80 +53,99 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Área do Produtor
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Entre com suas credenciais para acessar o dashboard
-          </p>
-        </div>
-        <div className="mt-8 space-y-6">
-          <div>
-            <h3 className="text-lg font-medium text-gray-900">
-              Identifique-se
-            </h3>
-          </div>
-          <form
-            className="space-y-4"
-            onSubmit={handleSubmit}
-            autoComplete="off"
-          >
-            <Input
-              label="E-mail"
-              name="email"
-              type="email"
-              placeholder="exemplo@site.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoFocus
-              autoComplete="username"
-              error={fieldError.email}
-              leftIcon={
-                <FontAwesomeIcon icon={faEnvelope} className="text-primary" />
-              }
-            />
-            <Input
-              label="Senha"
-              name="password"
-              type="password"
-              placeholder="********"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="off"
-              error={fieldError.password}
-              leftIcon={
-                <FontAwesomeIcon icon={faLock} className="text-primary" />
-              }
-            />
-            {error && (
-              <div className="text-red-600 text-sm text-center" role="alert">
-                {error}
-              </div>
-            )}
-            <div>
-              <button
-                type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-60"
-                disabled={loginMutation.isPending}
-                aria-busy={loginMutation.isPending}
-              >
-                {loginMutation.isPending ? "Entrando..." : "Acessar"}
-              </button>
-            </div>
-          </form>
-          <div className="text-center">
-            <a
-              href="/auth/esqueci-senha"
-              className="text-sm text-indigo-600 hover:text-indigo-500"
+    <div className="min-h-screen flex flex-col items-center px-4">
+      <Text
+        typeElement="h1"
+        color="secondary"
+        weight="700"
+        size="34px"
+        align="center"
+        className="mb-8"
+      >
+        Área do produtor
+      </Text>
+
+      <Text
+        color="secondary"
+        weight="bold"
+        size="16px"
+        align="center"
+        className="mb-2 tracking-wider uppercase"
+      >
+        Atenção
+      </Text>
+      <Text color="secondary" align="center" size="16px" className="mb-10">
+        Este acesso é destinado a produtores do Clube do Ingresso.
+      </Text>
+
+      {/* Formulário */}
+      <div className="w-full max-w-md bg-white rounded-lg shadow-sm border border-lightGray p-8">
+        <Text color="primary" weight="500" size="20px" className="mb-6">
+          Identifique-se
+        </Text>
+
+        <form className="space-y-4" onSubmit={handleSubmit} autoComplete="off">
+          <Input
+            label="E-mail"
+            name="email"
+            type="email"
+            placeholder="exemplo@site.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoFocus
+            autoComplete="username"
+            error={fieldError.email}
+            leftIcon={<FontAwesomeIcon icon={faEnvelope} />}
+          />
+
+          <Input
+            label="Senha"
+            name="password"
+            type="password"
+            placeholder="********"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="current-password"
+            error={fieldError.password}
+            leftIcon={<FontAwesomeIcon icon={faLock} />}
+          />
+
+          {error && (
+            <Text
+              color="error"
+              align="center"
+              size="14px"
+              className="mt-4"
+              typeElement="div"
             >
-              Perdeu a senha?
-            </a>
-          </div>
+              {error}
+            </Text>
+          )}
+
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            fullWidth
+            loading={loginMutation.isPending}
+            disabled={loginMutation.isPending}
+            className="mt-6"
+          >
+            {loginMutation.isPending ? "Entrando..." : "Acessar"}
+          </Button>
+        </form>
+
+        <div className="text-center mt-6">
+          <Link
+            href="/auth/esqueci-senha"
+            variant="secondary"
+            size="sm"
+            underline="none"
+          >
+            Perdeu a senha?
+          </Link>
         </div>
       </div>
     </div>

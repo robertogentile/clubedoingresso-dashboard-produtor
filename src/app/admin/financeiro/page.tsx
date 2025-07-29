@@ -1,5 +1,3 @@
-import { Sidebar, Header } from "@/components";
-
 export default function FinanceiroPage() {
   return (
     <main className="flex-1 p-8">

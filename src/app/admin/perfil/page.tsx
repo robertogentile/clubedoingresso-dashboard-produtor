@@ -1,5 +1,3 @@
-import { Header, Sidebar } from "@/components";
-
 export default function PerfilPage() {
   return (
     <div className="flex-1 p-8">

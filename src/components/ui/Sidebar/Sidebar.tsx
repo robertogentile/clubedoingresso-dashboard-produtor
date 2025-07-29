@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -163,13 +164,13 @@ export default function Sidebar({ className = "" }: SidebarProps) {
       {/* Logo */}
       <div className="p-6">
         <div className="flex items-center">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-red-500 rounded"></div>
-            <span className="text-xl font-bold text-gray-900">clube do</span>
-          </div>
-          <span className="text-xl font-bold text-indigo-600 ml-1">
-            ingresso
-          </span>
+          <Image
+            src="/images/logotipo-clube.svg"
+            alt="Clube do Ingresso"
+            width={300}
+            height={100}
+            className="mx-auto"
+          />
         </div>
       </div>
 

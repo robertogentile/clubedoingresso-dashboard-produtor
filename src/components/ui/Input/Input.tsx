@@ -11,9 +11,12 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   helperText?: string;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
+  variant?: "default" | "filled" | "outlined";
+  inputSize?: "sm" | "md" | "lg";
   className?: string;
   inputClassName?: string;
-  iconClassName?: string;
+  labelClassName?: string;
+  rounded?: boolean;
 }
 
 export default function Input({
@@ -22,9 +25,12 @@ export default function Input({
   helperText,
   leftIcon,
   rightIcon,
+  variant = "default",
+  inputSize = "md",
   className = "",
   inputClassName = "",
-  iconClassName = "text-primary",
+  labelClassName = "",
+  rounded = true,
   id,
   ...props
 }: InputProps) {
@@ -35,10 +41,53 @@ export default function Input({
   const renderIcon = (icon: ReactNode) => {
     if (isValidElement<{ className?: string }>(icon)) {
       return cloneElement(icon, {
-        className: `${icon.props.className ?? ""} ${iconClassName}`.trim(),
+        className: `${icon.props.className ?? ""}`.trim(),
       });
     }
     return icon;
+  };
+
+  const baseStyles =
+    "block w-full transition-all duration-200 focus:outline-none";
+
+  const variants = {
+    default: "bg-white shadow-sm",
+    filled: "border-0 bg-lightGray",
+    outlined: "border-2 bg-transparent",
+  };
+
+  const sizes = {
+    sm: "px-3 py-2 text-13px",
+    md: "px-4 py-3 text-14px",
+    lg: "px-5 py-4 text-16px",
+  };
+
+  const roundedClass = rounded ? "rounded-lg" : "rounded-none";
+
+  // Border fixo sempre primary, apenas muda em caso de erro
+  const borderStyles = hasError ? "border-error" : "";
+  const focusStyles = hasError ? "focus:border-error" : "focus:border-primary";
+
+  const inputClasses = `
+    ${baseStyles}
+    ${variants[variant]}
+    ${sizes[inputSize]}
+    ${roundedClass}
+    ${borderStyles}
+    ${focusStyles}
+    ${leftIcon ? "pl-11" : ""}
+    ${rightIcon ? "pr-11" : ""}
+    text-primary disabled:opacity-50 disabled:cursor-not-allowed
+    ${inputClassName}
+  `
+    .trim()
+    .replace(/\s+/g, " ");
+
+  // Style inline para border fixo primary
+  const inputStyle = {
+    border: hasError
+      ? "1px solid var(--color-error)"
+      : "1px solid var(--color-primary)",
   };
 
   return (
@@ -46,7 +95,7 @@ export default function Input({
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-primary mb-2"
+          className={`block text-14px font-medium text-primary mb-2 ${labelClassName}`}
         >
           {label}
         </label>
@@ -54,24 +103,13 @@ export default function Input({
       <div className="relative">
         {leftIcon && (
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span>{renderIcon(leftIcon)}</span>
+            <span className="text-gray-500">{renderIcon(leftIcon)}</span>
           </div>
         )}
         <input
           id={inputId}
-          className={`
-            block w-full px-4 py-3 border rounded-xl shadow-sm
-            text-primary bg-white placeholder-primary
-            focus:outline-none focus:ring-2 focus:ring-offset-0 transition-colors
-            ${leftIcon ? "pl-11" : ""}
-            ${rightIcon ? "pr-11" : ""}
-            ${
-              hasError
-                ? "border-error focus:border-error focus:ring-error"
-                : "border-primary focus:border-primary focus:ring-primary"
-            }
-            ${inputClassName}
-          `}
+          className={inputClasses}
+          style={inputStyle}
           aria-invalid={hasError}
           aria-describedby={
             hasError
@@ -84,14 +122,14 @@ export default function Input({
         />
         {rightIcon && (
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <span>{renderIcon(rightIcon)}</span>
+            <span className="text-gray-500">{renderIcon(rightIcon)}</span>
           </div>
         )}
       </div>
       {(error || helperText) && (
         <p
           id={hasError ? `${inputId}-error` : `${inputId}-helper`}
-          className={`mt-1 text-sm ${hasError ? "text-error" : "text-gray"}`}
+          className={`mt-2 text-12px ${hasError ? "text-error" : "text-muted"}`}
         >
           {error || helperText}
         </p>

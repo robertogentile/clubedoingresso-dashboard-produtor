@@ -1,17 +1,8 @@
 export default function EsqueciSenhaPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex flex-col items-center px-4">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <div className="flex items-center justify-center mb-6">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-red-500 rounded"></div>
-              <span className="text-xl font-bold text-gray-900">clube do</span>
-            </div>
-            <span className="text-xl font-bold text-indigo-600 ml-1">
-              ingresso
-            </span>
-          </div>
           <h2 className="text-3xl font-extrabold text-gray-900">
             Esqueci minha senha
           </h2>

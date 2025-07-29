@@ -40,14 +40,14 @@ export default function EventCard({
       {/* Event Image */}
       <div className="h-48 bg-gradient-to-r from-purple-500 to-pink-500 relative overflow-hidden">
         <Image
-          src={imageUrl || "/placeholder-event.jpg"}
+          src={imageUrl || "/images/placeholder-event.jpg"}
           alt={title}
           fill
           className="w-full h-full object-cover"
           sizes="100vw"
           priority
           placeholder="blur"
-          blurDataURL="/placeholder-event-blur.jpg"
+          blurDataURL="/images/placeholder-event-blur.jpg"
         />
       </div>
 

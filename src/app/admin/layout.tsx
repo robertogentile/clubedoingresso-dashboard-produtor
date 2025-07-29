@@ -17,7 +17,7 @@ export default function AdminLayout({
           <Header />
 
           {/* Main Content com limite de largura e centralização */}
-          <main className="flex-1 p-8">
+          <main className="flex-1 p-8 bg-gray-background">
             <div className="max-w-[1150px] mx-auto">{children}</div>
           </main>
         </div>

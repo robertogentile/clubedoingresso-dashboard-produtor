@@ -13,11 +13,21 @@ interface Producer {
   current_status: string;
 }
 
+interface SelectedEvent {
+  id: number;
+  name: string;
+  date: string;
+  location: string;
+  status: string;
+}
+
 interface AuthState {
   producer: Producer | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  selectedEvent: SelectedEvent | null;
   setProducer: (producer: Producer) => void;
+  setSelectedEvent: (event: SelectedEvent | null) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
   setTokens: (accessToken: string, refreshToken: string) => void;
@@ -32,10 +42,17 @@ export const useAuthStore = create<AuthState>()(
       producer: null,
       isAuthenticated: false,
       isLoading: false,
+      selectedEvent: null,
       lastActivity: null,
       setProducer: (producer) => set({ producer, isAuthenticated: true }),
+      setSelectedEvent: (selectedEvent) => set({ selectedEvent }),
       logout: () => {
-        set({ producer: null, isAuthenticated: false, lastActivity: null });
+        set({
+          producer: null,
+          isAuthenticated: false,
+          lastActivity: null,
+          selectedEvent: null,
+        });
         if (typeof window !== "undefined") {
           localStorage.removeItem("auth-token");
           localStorage.removeItem("refresh-token");
@@ -68,6 +85,7 @@ export const useAuthStore = create<AuthState>()(
         producer: state.producer,
         isAuthenticated: state.isAuthenticated,
         lastActivity: state.lastActivity,
+        selectedEvent: state.selectedEvent,
       }),
     }
   )

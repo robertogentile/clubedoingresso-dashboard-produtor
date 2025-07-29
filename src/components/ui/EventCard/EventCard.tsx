@@ -1,5 +1,10 @@
+"use client";
 import Image from "next/image";
+import { useAuthStore } from "@/lib/stores/auth-store";
+import { useRouter } from "next/navigation";
+
 interface EventCardProps {
+  id: number;
   title: string;
   date: string;
   location: string;
@@ -9,6 +14,7 @@ interface EventCardProps {
 }
 
 export default function EventCard({
+  id,
   title,
   date,
   location,
@@ -16,6 +22,10 @@ export default function EventCard({
   imageUrl,
   className = "",
 }: EventCardProps) {
+  const { selectedEvent, setSelectedEvent } = useAuthStore();
+  const router = useRouter();
+  const isSelected = selectedEvent?.id === id;
+
   const statusConfig = {
     Ativo: {
       color: "bg-green-500",
@@ -33,9 +43,25 @@ export default function EventCard({
 
   const currentStatus = statusConfig[status];
 
+  const handleSelectEvent = () => {
+    setSelectedEvent({
+      id,
+      name: title,
+      date,
+      location,
+      status,
+    });
+
+    // Redireciona para o dashboard após selecionar
+    router.push("/admin/dashboard");
+  };
+
   return (
     <div
-      className={`bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow ${className}`}
+      className={`bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow cursor-pointer ${
+        isSelected ? "ring-2 ring-primary" : ""
+      } ${className}`}
+      onClick={handleSelectEvent}
     >
       {/* Event Image */}
       <div className="h-48 bg-gradient-to-r from-purple-500 to-pink-500 relative overflow-hidden">
@@ -49,6 +75,18 @@ export default function EventCard({
           placeholder="blur"
           blurDataURL="/images/placeholder-event-blur.jpg"
         />
+        {/* Indicador de seleção */}
+        {isSelected && (
+          <div className="absolute top-2 right-2 bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+        )}
       </div>
 
       {/* Event Info */}

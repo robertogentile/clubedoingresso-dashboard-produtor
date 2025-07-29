@@ -27,6 +27,31 @@ export default function HomePage() {
     <div className="px-4 py-6 sm:px-0">
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Meus eventos</h2>
+
+        {/* Evento selecionado */}
+        {/*selectedEvent && (
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-medium text-blue-900">
+                  Evento selecionado:
+                </h3>
+                <p className="text-blue-700">{selectedEvent.name}</p>
+                <p className="text-sm text-blue-600">
+                  {new Date(selectedEvent.date).toLocaleDateString("pt-BR")} •{" "}
+                  {selectedEvent.location}
+                </p>
+              </div>
+              <button
+                onClick={() => setSelectedEvent(null)}
+                className="text-blue-600 hover:text-blue-800 text-sm"
+              >
+                Limpar seleção
+              </button>
+            </div>
+          </div>
+        )*/}
+
         {/* Search Bar */}
         <div className="mb-6">
           <div className="max-w-md">
@@ -38,6 +63,7 @@ export default function HomePage() {
             />
           </div>
         </div>
+
         {/* Tabs */}
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex space-x-8">
@@ -64,6 +90,7 @@ export default function HomePage() {
           </nav>
         </div>
       </div>
+
       {/* Events Grid */}
       {isLoading ? (
         <div className="text-center text-gray-500">Carregando eventos...</div>
@@ -80,6 +107,7 @@ export default function HomePage() {
           {events.map((event) => (
             <EventCard
               key={event.id}
+              id={event.id}
               title={event.name}
               date={new Date(event.date).toLocaleDateString("pt-BR")}
               location={event.location}

@@ -28,30 +28,6 @@ export default function HomePage() {
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Meus eventos</h2>
 
-        {/* Evento selecionado */}
-        {/*selectedEvent && (
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-medium text-blue-900">
-                  Evento selecionado:
-                </h3>
-                <p className="text-blue-700">{selectedEvent.name}</p>
-                <p className="text-sm text-blue-600">
-                  {new Date(selectedEvent.date).toLocaleDateString("pt-BR")} •{" "}
-                  {selectedEvent.location}
-                </p>
-              </div>
-              <button
-                onClick={() => setSelectedEvent(null)}
-                className="text-blue-600 hover:text-blue-800 text-sm"
-              >
-                Limpar seleção
-              </button>
-            </div>
-          </div>
-        )*/}
-
         {/* Search Bar */}
         <div className="mb-6">
           <div className="max-w-md">

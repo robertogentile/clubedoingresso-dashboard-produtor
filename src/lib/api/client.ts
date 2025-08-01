@@ -70,6 +70,9 @@ const createApiClient = (): AxiosInstance => {
             if (typeof window !== "undefined") {
               localStorage.removeItem("auth-token");
               localStorage.removeItem("refresh-token");
+              // Remove o cookie também
+              document.cookie =
+                "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
               window.location.href = "/auth/login";
             }
             toast.error("Sessão expirada. Faça login novamente.");
@@ -144,6 +147,9 @@ export const logout = () => {
   if (typeof window !== "undefined") {
     localStorage.removeItem("auth-token");
     localStorage.removeItem("refresh-token");
+    // Remove o cookie também
+    document.cookie =
+      "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     window.location.href = "/auth/login";
   }
 };

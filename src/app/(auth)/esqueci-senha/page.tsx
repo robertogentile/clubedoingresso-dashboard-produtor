@@ -38,7 +38,7 @@ export default function EsqueciSenhaPage() {
           </form>
           <div className="text-center">
             <a
-              href="/auth/login"
+              href="/login"
               className="text-sm text-indigo-600 hover:text-indigo-500"
             >
               Voltar para o login

@@ -14,7 +14,7 @@ export default function EventGuard({ children }: EventGuardProps) {
 
   useEffect(() => {
     if (!hasSelectedEvent) {
-      router.push("/admin/home");
+      router.push("/home");
     }
   }, [hasSelectedEvent, router]);
 
@@ -24,7 +24,7 @@ export default function EventGuard({ children }: EventGuardProps) {
         <div className="text-center">
           <div className="text-gray-500 mb-4">Selecione um evento primeiro</div>
           <button
-            onClick={() => router.push("/admin/home")}
+            onClick={() => router.push("/home")}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             Ir para Home

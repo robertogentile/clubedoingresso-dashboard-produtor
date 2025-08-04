@@ -47,7 +47,7 @@ export default function Header({ className = "" }: HeaderProps) {
           {/* Right Side - Profile Icon */}
           <div className="flex items-center ml-4">
             <Link
-              href="/admin/perfil"
+              href="/perfil"
               className="text-gray-500 hover:text-gray-700 transition-colors p-2 rounded-full hover:bg-gray-100"
             >
               <FontAwesomeIcon icon={faUser} className="w-6 h-6" />

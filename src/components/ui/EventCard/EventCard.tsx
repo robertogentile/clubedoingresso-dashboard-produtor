@@ -53,7 +53,7 @@ export default function EventCard({
     });
 
     // Redireciona para o dashboard após selecionar
-    router.push("/admin/dashboard");
+    router.push("/dashboard");
   };
 
   return (

@@ -42,7 +42,7 @@ export default function LoginPage() {
 
     try {
       await loginMutation.mutateAsync({ email, password });
-      router.replace("/admin/home");
+      router.replace("/home");
     } catch (err) {
       const errorMsg =
         err instanceof Error && err.message
@@ -139,7 +139,7 @@ export default function LoginPage() {
 
         <div className="text-center mt-6">
           <Link
-            href="/auth/esqueci-senha"
+            href="/esqueci-senha"
             variant="secondary"
             size="sm"
             underline="none"

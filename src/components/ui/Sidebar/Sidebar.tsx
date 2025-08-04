@@ -30,43 +30,43 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
-    href: "/admin/home",
+    href: "/home",
     label: "Home",
     icon: faHome,
     requiresEvent: false,
   },
   {
-    href: "/admin/dashboard",
+    href: "/dashboard",
     label: "Dashboard",
     icon: faThLarge,
     requiresEvent: true,
   },
   {
-    href: "/admin/relatorio",
+    href: "/relatorio",
     label: "Relatórios",
     icon: faChartBar,
     requiresEvent: true,
   },
   {
-    href: "/admin/financeiro",
+    href: "/financeiro",
     label: "Financeiro",
     icon: faDollarSign,
     requiresEvent: true,
   },
   {
-    href: "/admin/administracao",
+    href: "/administracao",
     label: "Administração",
     icon: faDesktop,
     requiresEvent: true,
   },
   {
-    href: "/admin/checkin",
+    href: "/checkin",
     label: "Check-in",
     icon: faCheckCircle,
     requiresEvent: true,
   },
   {
-    href: "/admin/perfil",
+    href: "/perfil",
     label: "Perfil",
     icon: faUser,
     requiresEvent: false,

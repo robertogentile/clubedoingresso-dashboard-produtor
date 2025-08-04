@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import {
+  isProtectedRoute,
+  isPublicRoute,
+  ROUTES,
+  getMatcherConfig,
+} from "@/lib/config/routes";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -50,26 +56,23 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get("auth-token");
   const hasValidToken = token && token.value && token.value !== "";
 
-  // Proteção de rotas
-  if (pathname.startsWith("/admin") && !hasValidToken) {
+  // Proteção de rotas - usando arrays configuráveis
+  if (isProtectedRoute(pathname) && !hasValidToken) {
     const redirectResponse = NextResponse.redirect(
-      new URL("/auth/login", request.url)
+      new URL(ROUTES.REDIRECTS.LOGIN, request.url)
     );
     redirectResponse.cookies.delete("auth-token");
     return redirectResponse;
   }
 
-  if (pathname === "/auth/login" && hasValidToken) {
-    return NextResponse.redirect(new URL("/admin/home", request.url));
+  // Redirecionar usuários autenticados que tentam acessar páginas de auth
+  if (isPublicRoute(pathname) && hasValidToken) {
+    return NextResponse.redirect(new URL(ROUTES.REDIRECTS.HOME, request.url));
   }
 
   return response;
 }
 
 export const config = {
-  matcher: [
-    "/admin/:path*",
-    "/auth/:path*",
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: getMatcherConfig(),
 };

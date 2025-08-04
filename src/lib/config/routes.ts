@@ -1,0 +1,47 @@
+// Configuração centralizada de rotas
+export const ROUTES = {
+  // Rotas protegidas (requerem autenticação)
+  PROTECTED: [
+    "/home",
+    "/dashboard",
+    "/perfil",
+    "/financeiro",
+    "/relatorio",
+    "/checkin",
+    "/administracao",
+  ] as const,
+
+  // Rotas públicas (não requerem autenticação)
+  PUBLIC: ["/login", "/esqueci-senha"] as const,
+
+  // Rotas de redirecionamento padrão
+  REDIRECTS: {
+    LOGIN: "/login",
+    HOME: "/home",
+    DASHBOARD: "/dashboard",
+  } as const,
+} as const;
+
+// Tipos para TypeScript
+export type ProtectedRoute = (typeof ROUTES.PROTECTED)[number];
+export type PublicRoute = (typeof ROUTES.PUBLIC)[number];
+
+// Funções utilitárias
+export function isProtectedRoute(pathname: string): boolean {
+  return ROUTES.PROTECTED.some((route) => pathname.startsWith(route));
+}
+
+export function isPublicRoute(pathname: string): boolean {
+  return ROUTES.PUBLIC.some((route) => pathname === route);
+}
+
+export function getMatcherConfig() {
+  return [
+    // Rotas protegidas
+    ...ROUTES.PROTECTED.map((route) => `${route}/:path*`),
+    // Rotas públicas
+    ...ROUTES.PUBLIC.map((route) => `${route}`),
+    // Outras rotas (exceto assets)
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+  ];
+}

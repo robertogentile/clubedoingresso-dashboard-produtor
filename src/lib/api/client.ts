@@ -72,7 +72,7 @@ const createApiClient = (): AxiosInstance => {
               // Remove o cookie também
               document.cookie =
                 "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-              window.location.href = "/auth/login";
+              window.location.href = "/login";
             }
             toast.error("Sessão expirada. Faça login novamente.");
             break;
@@ -149,7 +149,7 @@ export const logout = () => {
     // Remove o cookie também
     document.cookie =
       "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    window.location.href = "/auth/login";
+    window.location.href = "/login";
   }
 };
 
@@ -165,7 +165,7 @@ function resetSessionTimeout() {
     sessionTimeoutId = setTimeout(() => {
       localStorage.removeItem("auth-token");
       localStorage.removeItem("refresh-token");
-      window.location.href = "/auth/login";
+      window.location.href = "/login";
       // Broadcast logout para outras abas
       const bc = new BroadcastChannel("auth");
       bc.postMessage({ type: "logout", reason: "timeout" });
@@ -177,7 +177,7 @@ function resetSessionTimeout() {
 if (typeof window !== "undefined") {
   window.addEventListener("storage", (e) => {
     if (e.key === "auth-token" && !e.newValue) {
-      window.location.href = "/auth/login";
+      window.location.href = "/login";
     }
   });
   // BroadcastChannel para logout global
@@ -186,7 +186,7 @@ if (typeof window !== "undefined") {
     if (event.data?.type === "logout") {
       localStorage.removeItem("auth-token");
       localStorage.removeItem("refresh-token");
-      window.location.href = "/auth/login";
+      window.location.href = "/login";
     }
     if (event.data?.type === "login") {
       resetSessionTimeout();

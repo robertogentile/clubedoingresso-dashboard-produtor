@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { EventCard } from "@/components";
-import { useHomeEvents, Event } from "@/hooks/api/home/use-events";
-import { useAuthStore } from "@/lib/stores/auth-store";
+import { useHomeEvents, Event } from "@/hooks/api/home/useEvents";
+import { useAuthStore } from "@/lib/stores/authStore";
 
 export default function HomePage() {
   const producerId = useAuthStore((s) => s.producer?.id);

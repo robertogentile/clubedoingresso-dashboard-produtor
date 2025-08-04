@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuthStore } from "@/lib/stores/auth-store";
+import { useAuthStore } from "@/lib/stores/authStore";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
@@ -12,7 +12,6 @@ interface HeaderProps {
 export default function Header({ className = "" }: HeaderProps) {
   const { producer, selectedEvent } = useAuthStore();
 
-  // Formata a data para DD/MM/AAAA
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("pt-BR");
@@ -22,10 +21,8 @@ export default function Header({ className = "" }: HeaderProps) {
     <header className={`bg-white px-8 shadow ${className}`}>
       <div className="max-w-[1150px] mx-auto ">
         <div className="flex justify-between items-center py-4">
-          {/* Left Side - User Info or Event Info */}
           <div className="flex-1 min-w-0">
             {selectedEvent ? (
-              // Com evento selecionado
               <div className="flex flex-col">
                 <h1 className="text-lg font-bold text-gray-900 truncate">
                   {selectedEvent.name}
@@ -35,7 +32,6 @@ export default function Header({ className = "" }: HeaderProps) {
                 </p>
               </div>
             ) : (
-              // Sem evento selecionado
               <div className="flex flex-col">
                 <p className="text-lg font-medium text-gray-900">
                   Olá, {producer?.fantasy_name || "Usuário"}!
@@ -44,7 +40,6 @@ export default function Header({ className = "" }: HeaderProps) {
             )}
           </div>
 
-          {/* Right Side - Profile Icon */}
           <div className="flex items-center ml-4">
             <Link
               href="/perfil"

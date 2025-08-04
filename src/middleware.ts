@@ -7,51 +7,48 @@ import {
   getMatcherConfig,
 } from "@/lib/config/routes";
 
+function getAllowedConnectSrcs() {
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+    const urlObj = new URL(apiUrl);
+    const apiHostname =
+      urlObj.hostname + (urlObj.port ? `:${urlObj.port}` : "");
+
+    const allowedConnectSrcs = [
+      "'self'",
+      `http://${apiHostname}`,
+      `https://${apiHostname}`,
+      "http://localhost:3001",
+      "https://localhost:3001",
+    ].filter((url, index, arr) => arr.indexOf(url) === index);
+
+    const cspDirectives = [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "font-src 'self' data: https://fonts.gstatic.com",
+      "img-src 'self' data: https: http:",
+      `connect-src ${allowedConnectSrcs.join(" ")}`,
+      "media-src 'self'",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'none'",
+      "upgrade-insecure-requests",
+    ].join("; ");
+
+    return cspDirectives;
+  } catch (error) {
+    console.error(error);
+    return "";
+  }
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const response = NextResponse.next();
 
-  const extractHostname = (url: string): string => {
-    try {
-      const urlObj = new URL(url);
-      return urlObj.hostname + (urlObj.port ? `:${urlObj.port}` : "");
-    } catch (error) {
-      console.warn("Erro ao parsear URL:", url);
-      console.log(error);
-      return "localhost:3001";
-    }
-  };
-
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
-  const apiHostname = extractHostname(apiUrl);
-
-  // URLs permitidas para conexão (incluindo fallbacks para desenvolvimento)
-  const allowedConnectSrcs = [
-    "'self'",
-    `http://${apiHostname}`,
-    `https://${apiHostname}`,
-    // Fallbacks para desenvolvimento
-    "http://localhost:3001",
-    "https://localhost:3001",
-  ].filter((url, index, arr) => arr.indexOf(url) === index);
-
-  // CSP Header dinâmico (baseado na URL da API)
-  const cspDirectives = [
-    "default-src 'self'",
-    "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "font-src 'self' data: https://fonts.gstatic.com",
-    "img-src 'self' data: https: http:",
-    `connect-src ${allowedConnectSrcs.join(" ")}`,
-    "media-src 'self'",
-    "object-src 'none'",
-    "base-uri 'self'",
-    "form-action 'self'",
-    "frame-ancestors 'none'",
-    "upgrade-insecure-requests",
-  ].join("; ");
-
-  response.headers.set("Content-Security-Policy", cspDirectives);
+  response.headers.set("Content-Security-Policy", getAllowedConnectSrcs());
 
   const token = request.cookies.get("auth-token");
   const hasValidToken = token && token.value && token.value !== "";

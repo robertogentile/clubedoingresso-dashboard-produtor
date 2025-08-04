@@ -1,8 +1,8 @@
-import { useApiQuery } from "../use-api-query";
+import { useApiQuery } from "../useApiQuery";
 import {
   EventsResponseSchema,
   Event,
-} from "@/lib/validations/home/events-schema";
+} from "@/lib/validations/home/eventsSchema";
 
 export function useHomeEvents(
   producerId: string,

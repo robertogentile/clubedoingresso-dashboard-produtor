@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthLogin } from "@/hooks/api/auth/use-login";
+import { useAuthLogin } from "@/hooks/api/auth/useLogin";
 import { Input, Button, Text, Link } from "@/components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";

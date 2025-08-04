@@ -1,6 +1,6 @@
-import { useApiMutation } from "../use-api-mutation";
-import { LoginResponseSchema } from "@/lib/validations/auth/login-schema";
-import { useAuthStore } from "@/lib/stores/auth-store";
+import { useApiMutation } from "../useApiMutation";
+import { LoginResponseSchema } from "@/lib/validations/auth/loginSchema";
+import { useAuthStore } from "@/lib/stores/authStore";
 
 function setAuthCookie(token: string, isHttpOnly = false) {
   // Se a API suportar HttpOnly, o cookie deve ser setado pelo backend via Set-Cookie

@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuthStore } from "@/lib/stores/auth-store";
+import { useAuthStore } from "@/lib/stores/authStore";
 import { Button, Text, Input } from "@/components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {

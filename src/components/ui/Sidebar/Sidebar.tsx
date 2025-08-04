@@ -15,7 +15,7 @@ import {
   faSignOutAlt,
   IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
-import { useAuthStore } from "@/lib/stores/auth-store";
+import { useAuthStore } from "@/lib/stores/authStore";
 
 interface SidebarProps {
   className?: string;

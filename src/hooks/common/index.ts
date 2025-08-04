@@ -1,1 +1,1 @@
-export { useSelectedEvent } from "./use-selected-event";
+export { useSelectedEvent } from "./useSelectedEvent";

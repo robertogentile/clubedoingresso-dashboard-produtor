@@ -1,5 +1,5 @@
 // Hooks de Query
-export { useApiQuery } from "./use-api-query";
+export { useApiQuery } from "./useApiQuery";
 
 // Hooks de Mutation
-export { useApiMutation } from "./use-api-mutation";
+export { useApiMutation } from "./useApiMutation";

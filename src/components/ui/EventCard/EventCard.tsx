@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useAuthStore } from "@/lib/stores/auth-store";
+import { useAuthStore } from "@/lib/stores/authStore";
 import { useRouter } from "next/navigation";
 
 interface EventCardProps {

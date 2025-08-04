@@ -84,7 +84,7 @@ export const useAuthStore = create<AuthState>()(
       updateLastActivity: () => set({ lastActivity: Date.now() }),
     }),
     {
-      name: "auth-store",
+      name: "authStore",
       partialize: (state) => ({
         producer: state.producer,
         isAuthenticated: state.isAuthenticated,

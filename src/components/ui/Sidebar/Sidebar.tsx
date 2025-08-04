@@ -97,6 +97,7 @@ export default function Sidebar({ className = "" }: SidebarProps) {
             width={300}
             height={100}
             className="mx-auto"
+            priority={true}
           />
         </div>
       </div>

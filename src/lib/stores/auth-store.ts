@@ -66,7 +66,11 @@ export const useAuthStore = create<AuthState>()(
         if (typeof window !== "undefined") {
           localStorage.setItem("auth-token", accessToken);
           localStorage.setItem("refresh-token", refreshToken);
-          document.cookie = `auth-token=${accessToken}; path=/; SameSite=Strict; Secure`;
+          // Sincroniza com cookie para o middleware
+          // Em desenvolvimento (HTTP) não usa Secure, em produção (HTTPS) usa
+          const isSecure = window.location.protocol === "https:";
+          const secureFlag = isSecure ? "; Secure" : "";
+          document.cookie = `auth-token=${accessToken}; path=/; SameSite=Strict${secureFlag}; Max-Age=3600`;
         }
       },
       clearTokens: () => {

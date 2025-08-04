@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar, Header } from "@/components";
 import { useAuthStore } from "@/lib/stores/auth-store";
@@ -12,10 +12,24 @@ export default function AdminLayout({
 }) {
   const { isAuthenticated, producer } = useAuthStore();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Se não está autenticado ou não tem producer, redireciona para login
-    if (!isAuthenticated || !producer) {
+    // Verifica se há token no localStorage como fallback
+    const hasToken =
+      typeof window !== "undefined" && localStorage.getItem("auth-token");
+
+    // Se não está autenticado no Zustand mas tem token, aguarda um pouco
+    if (!isAuthenticated && hasToken) {
+      // Aguarda o Zustand carregar ou o token ser validado
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+
+    // Se não está autenticado e não tem token, redireciona
+    if (!isAuthenticated && !hasToken) {
       // Limpa qualquer token residual
       if (typeof window !== "undefined") {
         localStorage.removeItem("auth-token");
@@ -25,7 +39,21 @@ export default function AdminLayout({
       }
       router.push("/auth/login");
     }
+
+    setIsLoading(false);
   }, [isAuthenticated, producer, router]);
+
+  // Se está carregando, mostra loading
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Se não está autenticado, não renderiza nada
   if (!isAuthenticated || !producer) {

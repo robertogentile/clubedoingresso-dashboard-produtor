@@ -14,6 +14,7 @@ export default function AuthLayout({
           width={300}
           height={100}
           className="mx-auto"
+          priority={true}
         />
       </div>
       {children}

@@ -70,8 +70,8 @@ export default function EventCard({
           alt={title}
           fill
           className="w-full h-full object-cover"
-          sizes="100vw"
-          priority
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          loading="lazy"
           placeholder="blur"
           blurDataURL="/images/placeholder-event-blur.jpg"
         />

@@ -34,7 +34,6 @@ const createApiClient = (): AxiosInstance => {
           ? localStorage.getItem("auth-token")
           : null;
 
-      console.log("token", token);
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }

@@ -1,5 +1,6 @@
 ﻿import axios, { AxiosInstance, AxiosError } from "axios";
 import { toast } from "react-hot-toast";
+import { ROUTES } from "../config/routes";
 
 // Tipos para as respostas da API
 export interface ApiResponse<T = unknown> {
@@ -72,7 +73,7 @@ const createApiClient = (): AxiosInstance => {
               // Remove o cookie também
               document.cookie =
                 "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-              window.location.href = "/login";
+              window.location.href = ROUTES.REDIRECTS.LOGIN;
             }
             toast.error("Sessão expirada. Faça login novamente.");
             break;
@@ -149,7 +150,7 @@ export const logout = () => {
     // Remove o cookie também
     document.cookie =
       "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    window.location.href = "/login";
+    window.location.href = ROUTES.REDIRECTS.LOGIN;
   }
 };
 
@@ -165,7 +166,7 @@ function resetSessionTimeout() {
     sessionTimeoutId = setTimeout(() => {
       localStorage.removeItem("auth-token");
       localStorage.removeItem("refresh-token");
-      window.location.href = "/login";
+      window.location.href = ROUTES.REDIRECTS.LOGIN;
       // Broadcast logout para outras abas
       const bc = new BroadcastChannel("auth");
       bc.postMessage({ type: "logout", reason: "timeout" });
@@ -177,7 +178,7 @@ function resetSessionTimeout() {
 if (typeof window !== "undefined") {
   window.addEventListener("storage", (e) => {
     if (e.key === "auth-token" && !e.newValue) {
-      window.location.href = "/login";
+      window.location.href = ROUTES.REDIRECTS.LOGIN;
     }
   });
   // BroadcastChannel para logout global
@@ -186,7 +187,7 @@ if (typeof window !== "undefined") {
     if (event.data?.type === "logout") {
       localStorage.removeItem("auth-token");
       localStorage.removeItem("refresh-token");
-      window.location.href = "/login";
+      window.location.href = ROUTES.REDIRECTS.LOGIN;
     }
     if (event.data?.type === "login") {
       resetSessionTimeout();

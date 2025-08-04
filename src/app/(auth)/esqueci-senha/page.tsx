@@ -1,3 +1,6 @@
+import { Link } from "@/components";
+import { ROUTES } from "@/lib/config/routes";
+
 export default function EsqueciSenhaPage() {
   return (
     <div className="min-h-screen flex flex-col items-center px-4">
@@ -37,12 +40,12 @@ export default function EsqueciSenhaPage() {
             </div>
           </form>
           <div className="text-center">
-            <a
-              href="/login"
+            <Link
+              href={ROUTES.REDIRECTS.LOGIN}
               className="text-sm text-indigo-600 hover:text-indigo-500"
             >
               Voltar para o login
-            </a>
+            </Link>
           </div>
         </div>
       </div>

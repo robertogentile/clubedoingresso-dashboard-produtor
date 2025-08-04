@@ -4,6 +4,7 @@ import { useAuthStore } from "@/lib/stores/authStore";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { ROUTES } from "@/lib/config/routes";
 
 interface HeaderProps {
   className?: string;
@@ -42,7 +43,7 @@ export default function Header({ className = "" }: HeaderProps) {
 
           <div className="flex items-center ml-4">
             <Link
-              href="/perfil"
+              href={ROUTES.REDIRECTS.PERFIL}
               className="text-gray-500 hover:text-gray-700 transition-colors p-2 rounded-full hover:bg-gray-100"
             >
               <FontAwesomeIcon icon={faUser} className="w-6 h-6" />

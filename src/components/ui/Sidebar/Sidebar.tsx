@@ -16,6 +16,7 @@ import {
   IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuthStore } from "@/lib/stores/authStore";
+import { ROUTES } from "@/lib/config/routes";
 
 interface SidebarProps {
   className?: string;
@@ -30,43 +31,43 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
-    href: "/home",
+    href: ROUTES.REDIRECTS.HOME,
     label: "Home",
     icon: faHome,
     requiresEvent: false,
   },
   {
-    href: "/dashboard",
+    href: ROUTES.REDIRECTS.DASHBOARD,
     label: "Dashboard",
     icon: faThLarge,
     requiresEvent: true,
   },
   {
-    href: "/relatorio",
+    href: ROUTES.REDIRECTS.RELATORIO,
     label: "Relatórios",
     icon: faChartBar,
     requiresEvent: true,
   },
   {
-    href: "/financeiro",
+    href: ROUTES.REDIRECTS.FINANCEIRO,
     label: "Financeiro",
     icon: faDollarSign,
     requiresEvent: true,
   },
   {
-    href: "/administracao",
+    href: ROUTES.REDIRECTS.ADMINISTRACAO,
     label: "Administração",
     icon: faDesktop,
     requiresEvent: true,
   },
   {
-    href: "/checkin",
+    href: ROUTES.REDIRECTS.CHECKIN,
     label: "Check-in",
     icon: faCheckCircle,
     requiresEvent: true,
   },
   {
-    href: "/perfil",
+    href: ROUTES.REDIRECTS.PERFIL,
     label: "Perfil",
     icon: faUser,
     requiresEvent: false,

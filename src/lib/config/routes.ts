@@ -4,11 +4,11 @@ export const ROUTES = {
   PROTECTED: [
     "/home",
     "/dashboard",
-    "/perfil",
-    "/financeiro",
     "/relatorio",
-    "/checkin",
+    "/financeiro",
     "/administracao",
+    "/checkin",
+    "/perfil",
   ] as const,
 
   // Rotas públicas (não requerem autenticação)
@@ -17,8 +17,15 @@ export const ROUTES = {
   // Rotas de redirecionamento padrão
   REDIRECTS: {
     LOGIN: "/login",
+    ESQUECI_SENHA: "/esqueci-senha",
+
     HOME: "/home",
     DASHBOARD: "/dashboard",
+    RELATORIO: "/relatorio",
+    FINANCEIRO: "/financeiro",
+    ADMINISTRACAO: "/administracao",
+    CHECKIN: "/checkin",
+    PERFIL: "/perfil",
   } as const,
 } as const;
 

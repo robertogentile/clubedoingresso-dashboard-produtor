@@ -5,6 +5,7 @@ import { useAuthLogin } from "@/hooks/api/auth/useLogin";
 import { Input, Button, Text, Link } from "@/components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
+import { ROUTES } from "@/lib/config/routes";
 
 function validateEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -42,7 +43,7 @@ export default function LoginPage() {
 
     try {
       await loginMutation.mutateAsync({ email, password });
-      router.replace("/home");
+      router.replace(ROUTES.REDIRECTS.HOME);
     } catch (err) {
       const errorMsg =
         err instanceof Error && err.message
@@ -139,7 +140,7 @@ export default function LoginPage() {
 
         <div className="text-center mt-6">
           <Link
-            href="/esqueci-senha"
+            href={ROUTES.REDIRECTS.ESQUECI_SENHA}
             variant="secondary"
             size="sm"
             underline="none"

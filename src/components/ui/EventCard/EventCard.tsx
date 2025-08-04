@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { useRouter } from "next/navigation";
+import { ROUTES } from "@/lib/config/routes";
 
 interface EventCardProps {
   id: number;
@@ -53,7 +54,7 @@ export default function EventCard({
     });
 
     // Redireciona para o dashboard após selecionar
-    router.push("/dashboard");
+    router.push(ROUTES.REDIRECTS.DASHBOARD);
   };
 
   return (

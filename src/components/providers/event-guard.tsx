@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSelectedEvent } from "@/hooks/common";
+import { ROUTES } from "@/lib/config/routes";
 
 interface EventGuardProps {
   children: React.ReactNode;
@@ -14,7 +15,7 @@ export default function EventGuard({ children }: EventGuardProps) {
 
   useEffect(() => {
     if (!hasSelectedEvent) {
-      router.push("/home");
+      router.push(ROUTES.REDIRECTS.HOME);
     }
   }, [hasSelectedEvent, router]);
 
@@ -24,7 +25,7 @@ export default function EventGuard({ children }: EventGuardProps) {
         <div className="text-center">
           <div className="text-gray-500 mb-4">Selecione um evento primeiro</div>
           <button
-            onClick={() => router.push("/home")}
+            onClick={() => router.push(ROUTES.REDIRECTS.HOME)}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             Ir para Home

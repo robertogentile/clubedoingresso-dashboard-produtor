@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar, Header } from "@/components";
 import { useAuthStore } from "@/lib/stores/authStore";
+import { ROUTES } from "@/lib/config/routes";
 
 export default function AdminLayout({
   children,
@@ -24,7 +25,7 @@ export default function AdminLayout({
         document.cookie =
           "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
       }
-      router.push("/login");
+      router.push(ROUTES.REDIRECTS.LOGIN);
     }
   }, [isAuthenticated, producer, router]);
 

@@ -105,9 +105,9 @@ export default function Link({
   // Se for link externo ou estiver desabilitado, usar tag <a>
   if (isExternal || disabled) {
     return (
-      <a href={disabled ? undefined : href} {...linkProps}>
+      <Link href={disabled ? "" : href} {...linkProps}>
         {children}
-      </a>
+      </Link>
     );
   }
 

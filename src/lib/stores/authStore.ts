@@ -1,51 +1,51 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-interface Producer {
-  id: string;
-  email: string;
-  phone: string;
-  contact: string;
-  fantasy_name: string;
-  permissions: Record<string, string>;
-  features: Record<string, string>;
-  app_permission: string;
-  current_status: string;
-}
-
-interface SelectedEvent {
-  id: number;
-  name: string;
-  date: string;
-  location: string;
-  status: string;
-}
+import { authActions } from "./authActions";
+import { Producer, SelectedEvent, LoginData } from "./types";
 
 interface AuthState {
   producer: Producer | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   selectedEvent: SelectedEvent | null;
-  setProducer: (producer: Producer) => void;
-  setSelectedEvent: (event: SelectedEvent | null) => void;
-  logout: () => void;
-  setLoading: (loading: boolean) => void;
-  setTokens: (accessToken: string, refreshToken: string) => void;
-  clearTokens: () => void;
   lastActivity: number | null;
-  updateLastActivity: () => void;
 }
 
-export const useAuthStore = create<AuthState>()(
+interface AuthActions {
+  login: (data: LoginData) => void;
+  logout: () => void;
+  setSelectedEvent: (event: SelectedEvent | null) => void;
+  setLoading: (loading: boolean) => void;
+  updateLastActivity: () => void;
+  checkInactivity: () => boolean;
+}
+
+// Configuração de timeout (em minutos)
+const INACTIVITY_TIMEOUT_MINUTES = parseInt(
+  process.env.NEXT_PUBLIC_INACTIVITY_TIMEOUT_MINUTES || "30",
+  10
+);
+
+export const useAuthStore = create<AuthState & AuthActions>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       producer: null,
       isAuthenticated: false,
       isLoading: false,
       selectedEvent: null,
       lastActivity: null,
-      setProducer: (producer) => set({ producer, isAuthenticated: true }),
-      setSelectedEvent: (selectedEvent) => set({ selectedEvent }),
+
+      login: (data) => {
+        const { access_token, refresh_token, ...producerFields } = data;
+        set({
+          producer: producerFields,
+          isAuthenticated: true,
+          lastActivity: Date.now(),
+        });
+        authActions.setTokens(access_token, refresh_token);
+        authActions.broadcastLogin();
+      },
+
       logout: () => {
         set({
           producer: null,
@@ -53,35 +53,35 @@ export const useAuthStore = create<AuthState>()(
           lastActivity: null,
           selectedEvent: null,
         });
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("auth-token");
-          localStorage.removeItem("refresh-token");
-          document.cookie =
-            "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"; // Remove cookie
-          // Se for HttpOnly, o backend deve setar a expiração do cookie
-        }
+        authActions.clearTokens();
+        authActions.broadcastLogout();
       },
+
+      setSelectedEvent: (selectedEvent) => set({ selectedEvent }),
       setLoading: (isLoading) => set({ isLoading }),
-      setTokens: (accessToken, refreshToken) => {
-        if (typeof window !== "undefined") {
-          localStorage.setItem("auth-token", accessToken);
-          localStorage.setItem("refresh-token", refreshToken);
-          // Sincroniza com cookie para o middleware
-          // Em desenvolvimento (HTTP) não usa Secure, em produção (HTTPS) usa
-          const isSecure = window.location.protocol === "https:";
-          const secureFlag = isSecure ? "; Secure" : "";
-          document.cookie = `auth-token=${accessToken}; path=/; SameSite=Strict${secureFlag}; Max-Age=3600`;
-        }
-      },
-      clearTokens: () => {
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("auth-token");
-          localStorage.removeItem("refresh-token");
-          document.cookie =
-            "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-        }
-      },
       updateLastActivity: () => set({ lastActivity: Date.now() }),
+
+      checkInactivity: () => {
+        const state = get();
+        if (!state.isAuthenticated || !state.lastActivity) {
+          return false;
+        }
+
+        const now = Date.now();
+        const timeSinceLastActivity = now - state.lastActivity;
+        const timeoutMs = INACTIVITY_TIMEOUT_MINUTES * 60 * 1000;
+
+        if (timeSinceLastActivity > timeoutMs) {
+          // Auto logout por inatividade
+          state.logout();
+          if (typeof window !== "undefined") {
+            window.location.href = "/login";
+          }
+          return true;
+        }
+
+        return false;
+      },
     }),
     {
       name: "authStore",
@@ -94,6 +94,7 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
+
 // Helpers para permissões/features
 export function hasPermission(permission: string): boolean {
   const store = useAuthStore.getState();
@@ -102,6 +103,7 @@ export function hasPermission(permission: string): boolean {
     store.producer.permissions[permission] === "active"
   );
 }
+
 export function hasFeature(feature: string): boolean {
   const store = useAuthStore.getState();
   return (

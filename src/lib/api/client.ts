@@ -1,6 +1,8 @@
 ﻿import axios, { AxiosInstance, AxiosError } from "axios";
 import { toast } from "react-hot-toast";
-import { ROUTES } from "../config/routes";
+import { ROUTES } from "@/lib/config/routes";
+import { authActions } from "@/lib/stores/authActions";
+import { refreshTokenRequest } from "./auth";
 
 // Tipos para as respostas da API
 export interface ApiResponse<T = unknown> {
@@ -61,18 +63,29 @@ const createApiClient = (): AxiosInstance => {
 
       return response.data;
     },
-    (error: AxiosError<ApiError>) => {
+    async (error: AxiosError<ApiError>) => {
       if (error.response) {
         const { status, data } = error.response;
 
         switch (status) {
           case 401:
+            // Tenta fazer refresh do token antes de fazer logout
+            const refreshSuccess = await refreshTokenRequest();
+            if (refreshSuccess) {
+              // Se conseguiu refresh, retry a requisição original
+              const originalRequest = error.config;
+              if (originalRequest) {
+                const token = localStorage.getItem("auth-token");
+                if (token) {
+                  originalRequest.headers.Authorization = `Bearer ${token}`;
+                  return client(originalRequest);
+                }
+              }
+            }
+
+            // Se não conseguiu refresh, faz logout
             if (typeof window !== "undefined") {
-              localStorage.removeItem("auth-token");
-              localStorage.removeItem("refresh-token");
-              // Remove o cookie também
-              document.cookie =
-                "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+              authActions.clearTokens();
               window.location.href = ROUTES.REDIRECTS.LOGIN;
             }
             toast.error("Sessão expirada. Faça login novamente.");
@@ -109,49 +122,10 @@ const createApiClient = (): AxiosInstance => {
 
 export const apiClient = createApiClient();
 
-export const refreshToken = async (): Promise<string | null> => {
-  try {
-    const refreshTokenValue =
-      typeof window !== "undefined"
-        ? localStorage.getItem("refresh-token")
-        : null;
-
-    if (!refreshTokenValue) {
-      return null;
-    }
-
-    const response = await apiClient.post("/producer/refresh-token", {
-      refreshToken: refreshTokenValue,
-    });
-
-    if (response && typeof window !== "undefined") {
-      localStorage.setItem("auth-token", response.data.accessToken);
-      if (response.data.refreshToken) {
-        localStorage.setItem("refresh-token", response.data.refreshToken);
-      }
-      return response.data.accessToken;
-    }
-
-    return null;
-  } catch (error) {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("auth-token");
-      localStorage.removeItem("refresh-token");
-    }
-    console.log(error);
-    return null;
-  }
-};
-
 export const logout = () => {
-  if (typeof window !== "undefined") {
-    localStorage.removeItem("auth-token");
-    localStorage.removeItem("refresh-token");
-    // Remove o cookie também
-    document.cookie =
-      "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    window.location.href = ROUTES.REDIRECTS.LOGIN;
-  }
+  authActions.clearTokens();
+  authActions.broadcastLogout();
+  window.location.href = ROUTES.REDIRECTS.LOGIN;
 };
 
 const SESSION_TIMEOUT_MINUTES = parseInt(
@@ -164,13 +138,9 @@ function resetSessionTimeout() {
   if (sessionTimeoutId) clearTimeout(sessionTimeoutId);
   if (typeof window !== "undefined") {
     sessionTimeoutId = setTimeout(() => {
-      localStorage.removeItem("auth-token");
-      localStorage.removeItem("refresh-token");
+      authActions.clearTokens();
+      authActions.broadcastLogout();
       window.location.href = ROUTES.REDIRECTS.LOGIN;
-      // Broadcast logout para outras abas
-      const bc = new BroadcastChannel("auth");
-      bc.postMessage({ type: "logout", reason: "timeout" });
-      bc.close();
     }, SESSION_TIMEOUT_MINUTES * 60 * 1000);
   }
 }
@@ -181,21 +151,21 @@ if (typeof window !== "undefined") {
       window.location.href = ROUTES.REDIRECTS.LOGIN;
     }
   });
+
   // BroadcastChannel para logout global
   const bc = new BroadcastChannel("auth");
   bc.onmessage = (event) => {
     if (event.data?.type === "logout") {
-      localStorage.removeItem("auth-token");
-      localStorage.removeItem("refresh-token");
+      authActions.clearTokens();
       window.location.href = ROUTES.REDIRECTS.LOGIN;
     }
     if (event.data?.type === "login") {
       resetSessionTimeout();
     }
   };
+
   // Resetar timeout em qualquer interação
   ["click", "keydown", "mousemove", "scroll", "touchstart"].forEach((evt) => {
     window.addEventListener(evt, resetSessionTimeout);
   });
-  resetSessionTimeout();
 }

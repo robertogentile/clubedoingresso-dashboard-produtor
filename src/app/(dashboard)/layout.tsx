@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Sidebar, Header } from "@/components";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { ROUTES } from "@/lib/config/routes";
+import { useInactivityMonitor } from "@/hooks/common/useInactivityMonitor";
 
 export default function AdminLayout({
   children,
@@ -13,6 +14,9 @@ export default function AdminLayout({
 }) {
   const { isAuthenticated, producer } = useAuthStore();
   const router = useRouter();
+
+  // Monitoramento de inatividade apenas para usuários autenticados
+  useInactivityMonitor();
 
   useEffect(() => {
     const hasToken =

@@ -51,9 +51,9 @@ export function middleware(request: NextRequest) {
   response.headers.set("Content-Security-Policy", getAllowedConnectSrcs());
 
   const token = request.cookies.get("auth-token");
-  const hasValidToken = token && token.value && token.value !== "";
+  const hasValidToken = token?.value && token.value.length > 0;
 
-  // Proteção de rotas - usando arrays configuráveis
+  // Proteção de rotas
   if (isProtectedRoute(pathname) && !hasValidToken) {
     const redirectResponse = NextResponse.redirect(
       new URL(ROUTES.REDIRECTS.LOGIN, request.url)
@@ -62,7 +62,7 @@ export function middleware(request: NextRequest) {
     return redirectResponse;
   }
 
-  // Redirecionar usuários autenticados que tentam acessar páginas de auth
+  // Redirecionar usuários autenticados
   if (isPublicRoute(pathname) && hasValidToken) {
     return NextResponse.redirect(new URL(ROUTES.REDIRECTS.HOME, request.url));
   }

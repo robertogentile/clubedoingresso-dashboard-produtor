@@ -1,3 +1,3 @@
-export { QueryProvider } from "./query-provider";
-export { ToastProvider } from "./toast-provider";
-export { default as EventGuard } from "./event-guard";
+export { QueryProvider } from "./queryProvider";
+export { ToastProvider } from "./toastProvider";
+export { default as EventGuard } from "./eventGuard";

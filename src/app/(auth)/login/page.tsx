@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthLogin } from "@/hooks/api/auth/useLogin";
+import { useAuthLogin, useLoginErrorHandler } from "@/hooks/api/auth/useLogin";
 import { Input, Button, Text, Link } from "@/components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
@@ -21,6 +21,7 @@ export default function LoginPage() {
   }>({});
   const router = useRouter();
   const loginMutation = useAuthLogin();
+  const { extractLoginError } = useLoginErrorHandler();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,10 +46,7 @@ export default function LoginPage() {
       await loginMutation.mutateAsync({ email, password });
       router.replace(ROUTES.REDIRECTS.HOME);
     } catch (err) {
-      const errorMsg =
-        err instanceof Error && err.message
-          ? err.message
-          : "Erro ao fazer login. Verifique suas credenciais.";
+      const errorMsg = extractLoginError(err);
       setError(errorMsg);
     }
   };

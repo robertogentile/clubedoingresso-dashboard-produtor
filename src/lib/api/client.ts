@@ -3,6 +3,7 @@ import { toast } from "react-hot-toast";
 import { ROUTES } from "@/lib/config/routes";
 import { authActions } from "@/lib/stores/authActions";
 import { refreshTokenRequest } from "./auth";
+import { extractErrorMessage } from "@/lib/utils/errorUtils";
 
 // Tipos para as respostas da API
 export interface ApiResponse<T = unknown> {
@@ -65,14 +66,12 @@ const createApiClient = (): AxiosInstance => {
     },
     async (error: AxiosError<ApiError>) => {
       if (error.response) {
-        const { status, data } = error.response;
+        const { status } = error.response;
 
         switch (status) {
           case 401:
-            // Tenta fazer refresh do token antes de fazer logout
             const refreshSuccess = await refreshTokenRequest();
             if (refreshSuccess) {
-              // Se conseguiu refresh, retry a requisição original
               const originalRequest = error.config;
               if (originalRequest) {
                 const token = localStorage.getItem("auth-token");
@@ -83,7 +82,6 @@ const createApiClient = (): AxiosInstance => {
               }
             }
 
-            // Se não conseguiu refresh, faz logout
             if (typeof window !== "undefined") {
               authActions.clearTokens();
               window.location.href = ROUTES.REDIRECTS.LOGIN;
@@ -104,8 +102,8 @@ const createApiClient = (): AxiosInstance => {
             break;
 
           default:
-            const message = data?.message || "Erro na requisição";
-            toast.error(message);
+            const errorMessage = extractErrorMessage(error);
+            toast.error(errorMessage);
         }
       } else if (error.request) {
         toast.error("Erro de conexão. Verifique sua internet.");
@@ -152,7 +150,6 @@ if (typeof window !== "undefined") {
     }
   });
 
-  // BroadcastChannel para logout global
   const bc = new BroadcastChannel("auth");
   bc.onmessage = (event) => {
     if (event.data?.type === "logout") {
@@ -164,7 +161,6 @@ if (typeof window !== "undefined") {
     }
   };
 
-  // Resetar timeout em qualquer interação
   ["click", "keydown", "mousemove", "scroll", "touchstart"].forEach((evt) => {
     window.addEventListener(evt, resetSessionTimeout);
   });

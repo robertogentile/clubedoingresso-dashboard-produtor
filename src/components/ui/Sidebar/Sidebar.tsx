@@ -92,14 +92,16 @@ export default function Sidebar({ className = "" }: SidebarProps) {
       {/* Logo */}
       <div className="p-6">
         <div className="flex items-center">
-          <Image
-            src="/images/logotipo-clube.svg"
-            alt="Clube do Ingresso"
-            width={300}
-            height={100}
-            className="mx-auto"
-            priority={true}
-          />
+          <Link href={ROUTES.REDIRECTS.HOME}>
+            <Image
+              src="/images/logotipo-clube.svg"
+              alt="Clube do Ingresso"
+              width={300}
+              height={100}
+              className="mx-auto"
+              priority={true}
+            />
+          </Link>
         </div>
       </div>
 

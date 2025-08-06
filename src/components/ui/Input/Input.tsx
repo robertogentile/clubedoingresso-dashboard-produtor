@@ -57,9 +57,9 @@ export default function Input({
   };
 
   const sizes = {
-    sm: "px-3 py-2 text-13px",
-    md: "px-4 py-3 text-14px",
-    lg: "px-5 py-4 text-16px",
+    sm: "py-2 text-13px",
+    md: "py-2 md:py-3 text-12px md:text-14px",
+    lg: "py-4 text-16px",
   };
 
   const roundedClass = rounded ? "rounded-lg" : "rounded-none";
@@ -75,8 +75,8 @@ export default function Input({
     ${roundedClass}
     ${borderStyles}
     ${focusStyles}
-    ${leftIcon ? "pl-11" : ""}
-    ${rightIcon ? "pr-11" : ""}
+    ${leftIcon ? "all:pl-10" : ""}
+    ${rightIcon ? "all:pr-10" : ""}
     text-primary disabled:opacity-50 disabled:cursor-not-allowed
     ${inputClassName}
   `
@@ -95,7 +95,7 @@ export default function Input({
       {label && (
         <label
           htmlFor={inputId}
-          className={`block text-14px font-medium text-primary mb-2 ${labelClassName}`}
+          className={`block text-12px md:text-14px font-medium text-primary mb-2 ${labelClassName}`}
         >
           {label}
         </label>

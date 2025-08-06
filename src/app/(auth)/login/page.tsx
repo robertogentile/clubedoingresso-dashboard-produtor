@@ -52,14 +52,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center px-4">
+    <div className="flex flex-col items-center px-4">
       <Text
         typeElement="h1"
         color="secondary"
         weight="700"
-        size="34px"
         align="center"
-        className="mb-8"
+        size="24-28-34"
+        className="mb-4 md:mb-8"
       >
         Área do produtor
       </Text>
@@ -67,19 +67,24 @@ export default function LoginPage() {
       <Text
         color="secondary"
         weight="bold"
-        size="16px"
+        size="12-16"
         align="center"
         className="mb-2 tracking-wider uppercase"
       >
         Atenção
       </Text>
-      <Text color="secondary" align="center" size="16px" className="mb-10">
+      <Text
+        color="secondary"
+        align="center"
+        size="12-16"
+        className="mb-4 md:mb-10"
+      >
         Este acesso é destinado a produtores do Clube do Ingresso.
       </Text>
 
       {/* Formulário */}
-      <div className="w-full max-w-md bg-white rounded-lg shadow-sm border border-lightGray p-8">
-        <Text color="primary" weight="500" size="20px" className="mb-6">
+      <div className="w-full max-w-md bg-white rounded-lg shadow-sm border border-lightGray p-6 md:p-8">
+        <Text color="primary" weight="500" size="16-20" className="mb-6">
           Identifique-se
         </Text>
 
@@ -130,13 +135,13 @@ export default function LoginPage() {
             fullWidth
             loading={loginMutation.isPending}
             disabled={loginMutation.isPending}
-            className="mt-6"
+            className="mt-4 md:mt-6"
           >
             {loginMutation.isPending ? "Entrando..." : "Acessar"}
           </Button>
         </form>
 
-        <div className="text-center mt-6">
+        <div className="text-center mt-4">
           <Link
             href={ROUTES.REDIRECTS.ESQUECI_SENHA}
             variant="secondary"

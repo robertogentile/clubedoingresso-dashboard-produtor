@@ -42,8 +42,14 @@
   --text-64px: 4rem;
 
   --font-montserrat: "Montserrat", sans-serif, ui-sans-serif, system-ui;
+
+  --breakpoint-all: 0px;
 }
 
 * {
   font-family: var(--font-montserrat) !important;
+}
+
+body:has([data-auth-layout]) {
+  background-color: var(--color-gray-background);
 }

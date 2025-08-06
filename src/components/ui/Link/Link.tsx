@@ -39,6 +39,7 @@ export default function Link({
   const isExternal =
     external ||
     href.startsWith("http") ||
+    href.startsWith("https") ||
     href.startsWith("mailto:") ||
     href.startsWith("tel:");
 
@@ -54,11 +55,10 @@ export default function Link({
     blue: "text-blue hover:text-blue/80",
     purple: "text-purple hover:text-purple/80",
   };
-
   const sizes = {
-    sm: "text-sm",
-    md: "text-base",
-    lg: "text-lg",
+    sm: "text-12px",
+    md: "text-12px md:text-14px",
+    lg: "text-16px",
   };
 
   const weights = {

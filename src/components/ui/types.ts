@@ -53,6 +53,11 @@ export const sizeMap: Record<string, string> = {
   "48px": "text-48px",
   "56px": "text-56px",
   "64px": "text-64px",
+  "12-16": "text-[12px] md:text-[16px]",
+  "16-20": "text-[16px] md:text-[20px]",
+  "16-20-24": "text-16px md:text-[20px] lg:text-24px",
+  "24-28-34": "text-24px md:text-[28px] lg:text-34px",
+  "32-40-48": "text-32px md:text-[40px] lg:text-48px",
 };
 
 export const colorMap: Record<string, string> = {

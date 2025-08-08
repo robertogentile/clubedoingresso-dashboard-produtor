@@ -18,6 +18,7 @@ import {
   IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuthStore } from "@/lib/stores/authStore";
+import { logoutAction } from "@/lib/actions/auth/logout";
 import { ROUTES } from "@/lib/config/routes";
 
 interface SidebarProps {
@@ -131,9 +132,18 @@ export default function Sidebar({ className = "" }: SidebarProps) {
       ]
     : [];
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Limpar Zustand primeiro
     logout();
     setIsMenuOpen(false);
+
+    // Chamar Server Action para limpar cookies
+    const result = await logoutAction();
+
+    // Redirecionar no cliente se deu certo
+    if (result.success && result.redirectTo) {
+      window.location.href = result.redirectTo;
+    }
   };
 
   const toggleMenu = () => {

@@ -18,6 +18,7 @@ interface AuthActions {
   setLoading: (loading: boolean) => void;
   updateLastActivity: () => void;
   checkInactivity: () => boolean;
+  syncWithCookies: () => void;
 }
 
 // Configuração de timeout (em minutos)
@@ -36,13 +37,13 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       lastActivity: null,
 
       login: (data) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { access_token, refresh_token, ...producerFields } = data;
         set({
           producer: producerFields,
           isAuthenticated: true,
           lastActivity: Date.now(),
         });
-        authActions.setTokens(access_token, refresh_token);
         authActions.broadcastLogin();
       },
 
@@ -53,13 +54,37 @@ export const useAuthStore = create<AuthState & AuthActions>()(
           lastActivity: null,
           selectedEvent: null,
         });
-        authActions.clearTokens();
         authActions.broadcastLogout();
+
+        // O redirecionamento será feito pelo Server Action
+        // Não redirecionar aqui para evitar conflitos
       },
 
       setSelectedEvent: (selectedEvent) => set({ selectedEvent }),
       setLoading: (isLoading) => set({ isLoading }),
       updateLastActivity: () => set({ lastActivity: Date.now() }),
+
+      syncWithCookies: () => {
+        if (typeof window === "undefined") return;
+
+        const state = get();
+        if (state.isAuthenticated && state.producer) {
+          return;
+        }
+
+        // Se não está autenticado no Zustand, verificar se há cookies
+        // Como não podemos acessar cookies httpOnly no cliente,
+        // vamos assumir que se não há dados no Zustand, não está autenticado
+        if (!state.isAuthenticated || !state.producer) {
+          // Limpar estado se não há dados
+          set({
+            producer: null,
+            isAuthenticated: false,
+            lastActivity: null,
+            selectedEvent: null,
+          });
+        }
+      },
 
       checkInactivity: () => {
         const state = get();
@@ -75,7 +100,14 @@ export const useAuthStore = create<AuthState & AuthActions>()(
           // Auto logout por inatividade
           state.logout();
           if (typeof window !== "undefined") {
-            window.location.href = "/login";
+            // Usar o mesmo padrão do logout manual
+            import("@/lib/actions/auth/logout").then(({ logoutAction }) => {
+              logoutAction().then((result) => {
+                if (result.success && result.redirectTo) {
+                  window.location.href = result.redirectTo;
+                }
+              });
+            });
           }
           return true;
         }

@@ -2,8 +2,9 @@
 import { toast } from "react-hot-toast";
 import { ROUTES } from "@/lib/config/routes";
 import { authActions } from "@/lib/stores/authActions";
-import { refreshTokenRequest } from "./auth";
 import { extractErrorMessage } from "@/lib/utils/errorUtils";
+import { cookies } from "next/headers";
+import { refreshTokenAction } from "@/lib/actions/auth/refresh";
 
 // Tipos para as respostas da API
 export interface ApiResponse<T = unknown> {
@@ -32,11 +33,20 @@ const createApiClient = (): AxiosInstance => {
 
   // Interceptor para adicionar token de autenticação
   client.interceptors.request.use(
-    (config) => {
-      const token =
-        typeof window !== "undefined"
-          ? localStorage.getItem("auth-token")
-          : null;
+    async (config) => {
+      // Buscar token apenas de cookies httpOnly (servidor)
+      let token: string | null = null;
+
+      if (typeof window === "undefined") {
+        // Servidor: usar cookies httpOnly
+        try {
+          const cookieStore = await cookies();
+          token = cookieStore.get("auth-token")?.value || null;
+        } catch (error) {
+          console.error("Error getting auth token from cookies:", error);
+        }
+      }
+      // Cliente: não acessar tokens - apenas cookies httpOnly
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -59,56 +69,66 @@ const createApiClient = (): AxiosInstance => {
           );
           return Promise.reject(error);
         }
-        return response.data.data;
+        return response.data;
       }
 
       return response.data;
     },
     async (error: AxiosError<ApiError>) => {
-      if (error.response) {
-        const { status } = error.response;
+      // Só executar lógica específica do cliente se estivermos no browser
+      if (typeof window !== "undefined") {
+        if (error.response) {
+          const { status } = error.response;
 
-        switch (status) {
-          case 401:
-            const refreshSuccess = await refreshTokenRequest();
-            if (refreshSuccess) {
-              const originalRequest = error.config;
-              if (originalRequest) {
-                const token = localStorage.getItem("auth-token");
-                if (token) {
-                  originalRequest.headers.Authorization = `Bearer ${token}`;
-                  return client(originalRequest);
+          switch (status) {
+            case 401:
+              // Tentar refresh token uma vez
+              try {
+                const refreshResult = await refreshTokenAction();
+                if (refreshResult.success) {
+                  // Se refresh deu certo, refazer a requisição original
+                  const originalRequest = error.config;
+                  if (originalRequest) {
+                    // Buscar novo token dos cookies
+                    const cookieStore = await cookies();
+                    const newToken = cookieStore.get("auth-token")?.value;
+                    if (newToken) {
+                      originalRequest.headers.Authorization = `Bearer ${newToken}`;
+                      return client(originalRequest);
+                    }
+                  }
                 }
+              } catch (refreshError) {
+                console.error("Refresh token failed:", refreshError);
               }
-            }
 
-            if (typeof window !== "undefined") {
+              // Se refresh falhou ou não foi possível refazer requisição
               authActions.clearTokens();
               window.location.href = ROUTES.REDIRECTS.LOGIN;
-            }
-            toast.error("Sessão expirada. Faça login novamente.");
-            break;
+              toast.error("Sessão expirada. Faça login novamente.");
+              break;
 
-          case 403:
-            toast.error("Acesso negado. Verifique suas permissões.");
-            break;
+            case 403:
+              toast.error("Acesso negado. Verifique suas permissões.");
+              break;
 
-          case 429:
-            toast.error("Muitas requisições. Aguarde um momento.");
-            break;
+            case 429:
+              toast.error("Muitas requisições. Aguarde um momento.");
+              break;
 
-          case 500:
-            toast.error("Erro interno do servidor. Tente novamente.");
-            break;
+            case 500:
+              toast.error("Erro interno do servidor. Tente novamente.");
+              break;
 
-          default:
-            const errorMessage = extractErrorMessage(error);
-            toast.error(errorMessage);
+            default:
+              const errorMessage = extractErrorMessage(error);
+              toast.error(errorMessage);
+          }
+        } else if (error.request) {
+          toast.error("Erro de conexão. Verifique sua internet.");
+        } else {
+          toast.error("Erro na configuração da requisição.");
         }
-      } else if (error.request) {
-        toast.error("Erro de conexão. Verifique sua internet.");
-      } else {
-        toast.error("Erro na configuração da requisição.");
       }
 
       return Promise.reject(error);
@@ -120,10 +140,13 @@ const createApiClient = (): AxiosInstance => {
 
 export const apiClient = createApiClient();
 
+// Funções específicas do cliente (só executam no browser)
 export const logout = () => {
-  authActions.clearTokens();
-  authActions.broadcastLogout();
-  window.location.href = ROUTES.REDIRECTS.LOGIN;
+  if (typeof window !== "undefined") {
+    authActions.clearTokens();
+    authActions.broadcastLogout();
+    window.location.href = ROUTES.REDIRECTS.LOGIN;
+  }
 };
 
 const SESSION_TIMEOUT_MINUTES = parseInt(
@@ -143,6 +166,7 @@ function resetSessionTimeout() {
   }
 }
 
+// Event listeners só no cliente
 if (typeof window !== "undefined") {
   window.addEventListener("storage", (e) => {
     if (e.key === "auth-token" && !e.newValue) {

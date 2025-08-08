@@ -22,16 +22,5 @@ export const LoginResponseSchema = z.object({
   }),
 });
 
-export const RefreshTokenRequestSchema = z.object({
-  refresh_token: z.string().min(1, "Refresh token é obrigatório"),
-});
-
-export const RefreshTokenResponseSchema = z.object({
-  message: z.string(),
-  data: z.record(z.string(), z.unknown()), // data: {} vazio
-});
-
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;
 export type LoginResponse = z.infer<typeof LoginResponseSchema>;
-export type RefreshTokenRequest = z.infer<typeof RefreshTokenRequestSchema>;
-export type RefreshTokenResponse = z.infer<typeof RefreshTokenResponseSchema>;

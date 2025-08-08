@@ -1,55 +1,54 @@
 "use client";
-import { useState } from "react";
+
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthLogin, useLoginErrorHandler } from "@/hooks/api/auth/useLogin";
+import { loginAction } from "@/lib/actions/auth/login";
 import { Input, Button, Text, Link } from "@/components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
 import { ROUTES } from "@/lib/config/routes";
+import { useAuthStore } from "@/lib/stores/authStore";
 
-function validateEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+const initialState = {
+  message: null,
+  errors: {},
+};
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button
+      type="submit"
+      variant="primary"
+      size="lg"
+      fullWidth
+      loading={pending}
+      disabled={pending}
+      className="mt-4 md:mt-6"
+    >
+      {pending ? "Entrando..." : "Acessar"}
+    </Button>
+  );
 }
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [fieldError, setFieldError] = useState<{
-    email?: string;
-    password?: string;
-  }>({});
+  const [state, formAction] = useActionState(loginAction, initialState);
   const router = useRouter();
-  const loginMutation = useAuthLogin();
-  const { extractLoginError } = useLoginErrorHandler();
+  const login = useAuthStore((state) => state.login);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setFieldError({});
-    let hasError = false;
+  // Atualizar Zustand e redirecionar quando login for bem-sucedido
+  useEffect(() => {
+    if (state.success && state.data) {
+      // Atualizar Zustand com os dados do login
+      login(state.data);
 
-    if (!validateEmail(email)) {
-      setFieldError((prev) => ({ ...prev, email: "E-mail inválido." }));
-      hasError = true;
-    }
-    if (!password || password.length < 6) {
-      setFieldError((prev) => ({
-        ...prev,
-        password: "Senha deve ter pelo menos 6 caracteres.",
-      }));
-      hasError = true;
-    }
-    if (hasError) return;
-
-    try {
-      await loginMutation.mutateAsync({ email, password });
+      // Redirecionar para home
       router.replace(ROUTES.REDIRECTS.HOME);
-    } catch (err) {
-      const errorMsg = extractLoginError(err);
-      setError(errorMsg);
     }
-  };
+  }, [state.success, state.data, login, router]);
 
   return (
     <div className="flex flex-col items-center px-4">
@@ -88,18 +87,16 @@ export default function LoginPage() {
           Identifique-se
         </Text>
 
-        <form className="space-y-4" onSubmit={handleSubmit} autoComplete="off">
+        <form className="space-y-4" action={formAction} autoComplete="off">
           <Input
             label="E-mail"
             name="email"
             type="email"
             placeholder="exemplo@site.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
             required
             autoFocus
             autoComplete="username"
-            error={fieldError.email}
+            error={state.errors?.email?.[0]}
             leftIcon={<FontAwesomeIcon icon={faEnvelope} />}
           />
 
@@ -108,15 +105,13 @@ export default function LoginPage() {
             name="password"
             type="password"
             placeholder="********"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
             required
             autoComplete="current-password"
-            error={fieldError.password}
+            error={state.errors?.password?.[0]}
             leftIcon={<FontAwesomeIcon icon={faLock} />}
           />
 
-          {error && (
+          {state.message && (
             <Text
               color="error"
               align="center"
@@ -124,21 +119,11 @@ export default function LoginPage() {
               className="mt-4"
               typeElement="div"
             >
-              {error}
+              {state.message}
             </Text>
           )}
 
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            fullWidth
-            loading={loginMutation.isPending}
-            disabled={loginMutation.isPending}
-            className="mt-4 md:mt-6"
-          >
-            {loginMutation.isPending ? "Entrando..." : "Acessar"}
-          </Button>
+          <SubmitButton />
         </form>
 
         <div className="text-center mt-4">

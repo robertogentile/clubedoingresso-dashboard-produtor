@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSelectedEvent } from "@/hooks/common";
 import { ROUTES } from "@/lib/config/routes";
@@ -12,24 +12,23 @@ interface EventGuardProps {
 export default function EventGuard({ children }: EventGuardProps) {
   const { hasSelectedEvent } = useSelectedEvent();
   const router = useRouter();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
+  // Redirecionamento para home se não há evento selecionado
   useEffect(() => {
     if (!hasSelectedEvent) {
+      setIsRedirecting(true);
       router.push(ROUTES.REDIRECTS.HOME);
     }
   }, [hasSelectedEvent, router]);
 
-  if (!hasSelectedEvent) {
+  // Mostrar loading durante redirecionamento
+  if (isRedirecting || !hasSelectedEvent) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="text-gray-500 mb-4">Selecione um evento primeiro</div>
-          <button
-            onClick={() => router.push(ROUTES.REDIRECTS.HOME)}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Ir para Home
-          </button>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Redirecionando...</p>
         </div>
       </div>
     );

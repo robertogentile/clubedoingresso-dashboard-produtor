@@ -20,6 +20,8 @@ function getAllowedConnectSrcs() {
       `https://${apiHostname}`,
       "http://localhost:3001",
       "https://localhost:3001",
+      "http://localhost:3000",
+      "https://localhost:3000",
     ].filter((url, index, arr) => arr.indexOf(url) === index);
 
     const cspDirectives = [
@@ -34,7 +36,10 @@ function getAllowedConnectSrcs() {
       "base-uri 'self'",
       "form-action 'self'",
       "frame-ancestors 'none'",
-      "upgrade-insecure-requests",
+      // Remover upgrade-insecure-requests em desenvolvimento
+      ...(process.env.NODE_ENV === "production"
+        ? ["upgrade-insecure-requests"]
+        : []),
     ].join("; ");
 
     return cspDirectives;
@@ -48,22 +53,32 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const response = NextResponse.next();
 
-  response.headers.set("Content-Security-Policy", getAllowedConnectSrcs());
+  if (process.env.NODE_ENV === "production") {
+    response.headers.set("Content-Security-Policy", getAllowedConnectSrcs());
+  }
 
-  const token = request.cookies.get("auth-token");
-  const hasValidToken = token?.value && token.value.length > 0;
+  const authToken = request.cookies.get("auth-token");
+  const producerId = request.cookies.get("producer-id");
+
+  // Verificar se tem tanto auth-token quanto producer-id
+  const hasValidAuth = authToken?.value && authToken.value.length > 0;
+  const hasValidProducer = producerId?.value && producerId.value.length > 0;
+  const isAuthenticated = hasValidAuth && hasValidProducer;
 
   // Proteção de rotas
-  if (isProtectedRoute(pathname) && !hasValidToken) {
+  if (isProtectedRoute(pathname) && !isAuthenticated) {
     const redirectResponse = NextResponse.redirect(
       new URL(ROUTES.REDIRECTS.LOGIN, request.url)
     );
+    // Limpar cookies se não está autenticado
     redirectResponse.cookies.delete("auth-token");
+    redirectResponse.cookies.delete("refresh-token");
+    redirectResponse.cookies.delete("producer-id");
     return redirectResponse;
   }
 
   // Redirecionar usuários autenticados
-  if (isPublicRoute(pathname) && hasValidToken) {
+  if (isPublicRoute(pathname) && isAuthenticated) {
     return NextResponse.redirect(new URL(ROUTES.REDIRECTS.HOME, request.url));
   }
 

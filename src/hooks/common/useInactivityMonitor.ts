@@ -1,11 +1,21 @@
 import { useEffect, useRef } from "react";
 import { useAuthStore } from "@/lib/stores/authStore";
 
-// Configuração de timeout (em minutos)
-const INACTIVITY_TIMEOUT_MINUTES = parseInt(
-  process.env.NEXT_PUBLIC_INACTIVITY_TIMEOUT_MINUTES || "30",
-  10
-);
+// Função debounce para evitar muitas atualizações
+function debounce<T extends (...args: unknown[]) => void>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout;
+  return function executedFunction(...args: Parameters<T>) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
 
 export function useInactivityMonitor() {
   const { isAuthenticated, updateLastActivity, checkInactivity } =
@@ -17,10 +27,10 @@ export function useInactivityMonitor() {
       return;
     }
 
-    // Função para atualizar atividade
-    const updateActivity = () => {
+    // Debounce para evitar muitas atualizações (1 segundo)
+    const debouncedUpdate = debounce(() => {
       updateLastActivity();
-    };
+    }, 1000);
 
     // Função para verificar inatividade
     const checkActivity = () => {
@@ -30,29 +40,27 @@ export function useInactivityMonitor() {
       }
     };
 
-    // Eventos que indicam atividade do usuário
+    // Apenas eventos essenciais (reduzido de 7 para 4)
     const activityEvents = [
       "mousedown",
-      "mousemove",
       "keypress",
-      "scroll",
-      "touchstart",
       "click",
-      "keydown",
+      "touchstart",
+      "scroll",
     ];
 
     // Adicionar listeners para eventos de atividade
     activityEvents.forEach((event) => {
-      document.addEventListener(event, updateActivity, true);
+      document.addEventListener(event, debouncedUpdate, true);
     });
 
-    // Verificar inatividade a cada minuto
-    intervalRef.current = setInterval(checkActivity, 60 * 1000);
+    // Verificar inatividade a cada 5 minutos (reduzido de 1 para 5 minutos)
+    intervalRef.current = setInterval(checkActivity, 5 * 60 * 1000);
 
     // Cleanup
     return () => {
       activityEvents.forEach((event) => {
-        document.removeEventListener(event, updateActivity, true);
+        document.removeEventListener(event, debouncedUpdate, true);
       });
 
       if (intervalRef.current) {

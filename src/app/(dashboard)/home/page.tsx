@@ -1,27 +1,44 @@
-"use client";
-import { useEffect, useState } from "react";
-import { EventCard } from "@/components";
-import { useHomeEvents, Event } from "@/hooks/api/home/useEvents";
-import { useAuthStore } from "@/lib/stores/authStore";
+import { getEventsAction } from "@/lib/actions";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { ROUTES } from "@/lib/config/routes";
+import EventsTabs from "./components/EventsTabs";
 
-export default function HomePage() {
-  const producerId = useAuthStore((s) => s.producer?.id);
-  const { data, isLoading, error } = useHomeEvents(producerId ?? "", {
-    enabled: !!producerId,
-  });
-  const [tab, setTab] = useState<"upcoming" | "past">("upcoming");
+// Função para buscar os dados no servidor
+async function getEvents() {
+  try {
+    // Buscar producerId dos cookies httpOnly
+    const cookieStore = await cookies();
+    const producerId = cookieStore.get("producer-id")?.value;
+    const authToken = cookieStore.get("auth-token")?.value;
 
-  useEffect(() => {
-    setTab("upcoming");
-  }, [producerId]);
+    // Verificar autenticação
+    if (!authToken || !producerId) {
+      // Redirecionar para login se não estiver autenticado
+      redirect(ROUTES.REDIRECTS.LOGIN);
+    }
 
-  if (!producerId) {
-    return (
-      <div className="text-center text-gray-500">Carregando usuário...</div>
-    );
+    const result = await getEventsAction(producerId);
+
+    if (result.success && result.data) {
+      return result.data;
+    }
+
+    return {
+      upcoming: [],
+      past: [],
+    };
+  } catch {
+    return {
+      upcoming: [],
+      past: [],
+    };
   }
+}
 
-  const events: Event[] = data?.data?.[tab] || [];
+export default async function HomePage() {
+  // Buscar dados no servidor
+  const events = await getEvents();
 
   return (
     <div className="px-4 py-6 sm:px-0">
@@ -39,60 +56,10 @@ export default function HomePage() {
             />
           </div>
         </div>
-
-        {/* Tabs */}
-        <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8">
-            <button
-              className={`border-b-2 py-2 px-1 text-sm font-medium focus:outline-none ${
-                tab === "upcoming"
-                  ? "border-indigo-500 text-indigo-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
-              onClick={() => setTab("upcoming")}
-            >
-              PRÓXIMOS
-            </button>
-            <button
-              className={`border-b-2 py-2 px-1 text-sm font-medium focus:outline-none ${
-                tab === "past"
-                  ? "border-indigo-500 text-indigo-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
-              onClick={() => setTab("past")}
-            >
-              PASSADOS
-            </button>
-          </nav>
-        </div>
       </div>
 
-      {/* Events Grid */}
-      {isLoading ? (
-        <div className="text-center text-gray-500">Carregando eventos...</div>
-      ) : error ? (
-        <div className="text-center text-red-600">
-          Erro ao carregar eventos.
-        </div>
-      ) : events.length === 0 ? (
-        <div className="text-center text-gray-500">
-          Nenhum evento encontrado.
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {events.map((event) => (
-            <EventCard
-              key={event.id}
-              id={event.id}
-              title={event.name}
-              date={new Date(event.date).toLocaleDateString("pt-BR")}
-              location={event.location}
-              status={event.status as "Ativo" | "Oculto" | "Inativo"}
-              imageUrl={event.banner ?? undefined}
-            />
-          ))}
-        </div>
-      )}
+      {/* Componente cliente para tabs interativas */}
+      <EventsTabs events={events} />
     </div>
   );
 }

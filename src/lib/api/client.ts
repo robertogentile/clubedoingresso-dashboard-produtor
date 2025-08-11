@@ -3,8 +3,6 @@ import { toast } from "react-hot-toast";
 import { ROUTES } from "@/lib/config/routes";
 import { authActions } from "@/lib/stores/authActions";
 import { extractErrorMessage } from "@/lib/utils/errorUtils";
-import { cookies } from "next/headers";
-import { refreshTokenAction } from "@/lib/actions/auth/refresh";
 
 // Tipos para as respostas da API
 export interface ApiResponse<T = unknown> {
@@ -24,7 +22,7 @@ export interface ApiError {
 // Configuração base do cliente
 const createApiClient = (): AxiosInstance => {
   const client = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api",
+    baseURL: process.env.API_URL || "http://localhost:3001",
     timeout: 10000,
     headers: {
       "Content-Type": "application/json",
@@ -34,24 +32,8 @@ const createApiClient = (): AxiosInstance => {
   // Interceptor para adicionar token de autenticação
   client.interceptors.request.use(
     async (config) => {
-      // Buscar token apenas de cookies httpOnly (servidor)
-      let token: string | null = null;
-
-      if (typeof window === "undefined") {
-        // Servidor: usar cookies httpOnly
-        try {
-          const cookieStore = await cookies();
-          token = cookieStore.get("auth-token")?.value || null;
-        } catch (error) {
-          console.error("Error getting auth token from cookies:", error);
-        }
-      }
-      // Cliente: não acessar tokens - apenas cookies httpOnly
-
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-
+      // No cliente, não podemos acessar cookies httpOnly
+      // A autenticação será feita via server actions ou rotas internas
       return config;
     },
     (error) => {
@@ -82,25 +64,8 @@ const createApiClient = (): AxiosInstance => {
 
           switch (status) {
             case 401:
-              // Tentar refresh token uma vez
-              try {
-                const refreshResult = await refreshTokenAction();
-                if (refreshResult.success) {
-                  // Se refresh deu certo, refazer a requisição original
-                  const originalRequest = error.config;
-                  if (originalRequest) {
-                    // Buscar novo token dos cookies
-                    const cookieStore = await cookies();
-                    const newToken = cookieStore.get("auth-token")?.value;
-                    if (newToken) {
-                      originalRequest.headers.Authorization = `Bearer ${newToken}`;
-                      return client(originalRequest);
-                    }
-                  }
-                }
-              } catch (refreshError) {
-                console.error("Refresh token failed:", refreshError);
-              }
+              // Em 401, redirecionar para login (refresh será feito via server action)
+              console.error("Unauthorized - redirecting to login");
 
               // Se refresh falhou ou não foi possível refazer requisição
               authActions.clearTokens();

@@ -4,6 +4,12 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
 
+  // Configuração para debug
+  experimental: {
+    // Mantém configurações existentes
+    optimizePackageImports: ["@fortawesome/react-fontawesome"],
+  },
+
   // Headers de segurança estáticos
   async headers() {
     return [
@@ -74,11 +80,6 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 dias
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-  },
-
-  // Configurações de performance
-  experimental: {
-    optimizePackageImports: ["@fortawesome/react-fontawesome"],
   },
 };
 

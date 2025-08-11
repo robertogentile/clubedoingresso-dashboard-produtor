@@ -1,7 +1,7 @@
 // Auth Actions
-export { loginAction } from "./auth/login";
+export { loginAction } from "@/features/auth/actions";
 export { logoutAction } from "./auth/logout";
 export { refreshTokenAction } from "./auth/refresh";
 
 // Home Actions
-export { getEventsAction } from "./home/events";
+export { getEventsAction } from "@/features/events/actions";

@@ -1,43 +1,36 @@
-import { getEventsAction } from "@/lib/actions";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ROUTES } from "@/lib/config/routes";
-import EventsTabs from "./components/EventsTabs";
+// import EventsTabs from "./components/EventsTabs";
+import EventsList from "@/features/events/components/EventsList";
 
-// Função para buscar os dados no servidor
+// Busca inicial utilizando fetch do servidor com cache do Next.js
 async function getEvents() {
-  try {
-    // Buscar producerId dos cookies httpOnly
-    const cookieStore = await cookies();
-    const producerId = cookieStore.get("producer-id")?.value;
-    const authToken = cookieStore.get("auth-token")?.value;
+  const cookieStore = await cookies();
+  const token =
+    cookieStore.get("accessToken")?.value ??
+    cookieStore.get("auth-token")?.value;
+  const producerId = cookieStore.get("producer-id")?.value;
 
-    // Verificar autenticação
-    if (!authToken || !producerId) {
-      // Redirecionar para login se não estiver autenticado
-      redirect(ROUTES.REDIRECTS.LOGIN);
+  if (!token || !producerId) redirect(ROUTES.REDIRECTS.LOGIN);
+
+  const response = await fetch(
+    `${process.env.API_URL}/producer/events?producerId=${producerId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      next: { revalidate: 3600 },
     }
-
-    const result = await getEventsAction(producerId);
-
-    if (result.success && result.data) {
-      return result.data;
-    }
-
-    return {
-      upcoming: [],
-      past: [],
-    };
-  } catch {
-    return {
-      upcoming: [],
-      past: [],
-    };
+  );
+  if (!response.ok) {
+    return { upcoming: [], past: [] };
   }
+  const json = await response.json();
+  return json?.data ?? { upcoming: [], past: [] };
 }
 
 export default async function HomePage() {
-  // Buscar dados no servidor
+  const cookieStore = await cookies();
+  const producerId = cookieStore.get("producer-id")?.value || "";
   const events = await getEvents();
 
   return (
@@ -58,8 +51,8 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* Componente cliente para tabs interativas */}
-      <EventsTabs events={events} />
+      {/* Componente cliente hidratado com dados iniciais */}
+      <EventsList initialEvents={events} producerId={producerId} />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 import { QueryProvider, ToastProvider } from "@/components/providers";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 export const metadata: Metadata = {
   title: "Clube do Ingresso - Dashboard",
@@ -21,7 +22,7 @@ export default function RootLayout({
       <body>
         <QueryProvider>
           <ToastProvider />
-          {children}
+          <ErrorBoundary>{children}</ErrorBoundary>
         </QueryProvider>
       </body>
     </html>

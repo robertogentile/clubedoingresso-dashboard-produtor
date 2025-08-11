@@ -1,66 +1,56 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { apiClient } from "@/lib/api/client";
+import { serverRequest } from "@/lib/api/server";
+import { z } from "zod";
 
-interface RefreshResponse {
-  message: string;
-  data: {
-    access_token: string;
-  };
+const RefreshResponseSchema = z.object({
+  message: z.string(),
+  data: z.object({ access_token: z.string().min(1) }),
+});
+
+export interface ActionResult<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
 }
 
-export async function refreshTokenAction() {
+export async function refreshTokenAction(): Promise<
+  ActionResult<{ message: string }>
+> {
   try {
     const cookieStore = await cookies();
-    const refreshToken = cookieStore.get("refresh-token")?.value;
+    const refreshToken =
+      cookieStore.get("refreshToken")?.value ??
+      cookieStore.get("refresh-token")?.value ??
+      "";
 
     if (!refreshToken) {
-      return {
-        success: false,
-        message: "Refresh token não encontrado",
-      };
+      return { success: false, error: "Refresh token não encontrado" };
     }
 
-    // Fazer requisição para refresh
-    const response = await apiClient.post("/producer/refresh-token", {
-      refresh_token: refreshToken,
-    });
+    const payload = await serverRequest((api) =>
+      api.post("/producer/refresh-token", { refresh_token: refreshToken })
+    );
+    const validated = RefreshResponseSchema.parse(payload);
 
-    const validatedResponse = response as RefreshResponse;
-
-    if (!validatedResponse.data?.access_token) {
-      return {
-        success: false,
-        message: "Novo token não recebido",
-      };
-    }
-
-    // Atualizar apenas o auth-token (refresh-token permanece o mesmo)
-    cookieStore.set("auth-token", validatedResponse.data.access_token, {
+    cookieStore.set("accessToken", validated.data.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 15, // 15 minutos
+      maxAge: 60 * 15,
     });
 
-    return {
-      success: true,
-      message: "Token renovado com sucesso",
-    };
+    return { success: true, data: { message: validated.message } };
   } catch (error: unknown) {
-    console.error("Refresh token error:", error);
-
-    // Se falhou, limpar cookies e retornar erro
     const cookieStore = await cookies();
-    cookieStore.delete("auth-token");
-    cookieStore.delete("refresh-token");
+    cookieStore.delete("accessToken");
+    cookieStore.delete("refreshToken");
     cookieStore.delete("producer-id");
-
     return {
       success: false,
-      message: "Falha ao renovar token",
+      error: error instanceof Error ? error.message : "Falha ao renovar token",
     };
   }
 }

@@ -2,16 +2,15 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api/client";
-import { EventCard } from "@/components";
-import { Event } from "@/hooks/api/home/useEvents";
+import EventCard from "./EventCard";
+import type { Event } from "@/features/events/schema";
 
-// A função de fetch que o TanStack Query usará para refetch, etc.
-const fetchEvents = async (producerId: string) => {
+async function fetchEvents(producerId: string) {
   const { data } = await apiClient.get("/producer/events", {
     params: { producerId },
   });
   return data;
-};
+}
 
 interface EventsListProps {
   initialEvents: {
@@ -28,7 +27,7 @@ export default function EventsList({
   const { data: events } = useQuery({
     queryKey: ["events", producerId],
     queryFn: () => fetchEvents(producerId),
-    initialData: initialEvents, // Hidratação dos dados iniciais!
+    initialData: initialEvents,
   });
 
   return (

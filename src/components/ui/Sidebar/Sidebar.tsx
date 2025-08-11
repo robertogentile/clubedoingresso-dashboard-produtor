@@ -136,11 +136,7 @@ export default function Sidebar({ className = "" }: SidebarProps) {
     // Limpar Zustand primeiro
     logout();
     setIsMenuOpen(false);
-
-    // Chamar Server Action para limpar cookies
     const result = await logoutAction();
-
-    // Redirecionar no cliente se deu certo
     if (result.success && result.redirectTo) {
       window.location.href = result.redirectTo;
     }

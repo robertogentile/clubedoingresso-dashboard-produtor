@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Event } from "@/hooks/api/home/useEvents";
-import { EventCard } from "@/components";
+import type { Event } from "@/features/events/schema";
+import EventCard from "@/features/events/components/EventCard";
 
 interface EventsTabsProps {
   events: {

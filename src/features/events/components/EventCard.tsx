@@ -40,7 +40,7 @@ export default function EventCard({
       color: "bg-gray-500",
       label: "Inativo",
     },
-  };
+  } as const;
 
   const currentStatus = statusConfig[status];
 
@@ -53,7 +53,6 @@ export default function EventCard({
       status,
     });
 
-    // Redireciona para o dashboard após selecionar
     router.push(ROUTES.REDIRECTS.DASHBOARD);
   };
 
@@ -64,7 +63,6 @@ export default function EventCard({
       } ${className}`}
       onClick={handleSelectEvent}
     >
-      {/* Event Image */}
       <div className="h-48 bg-gradient-to-r from-purple-500 to-pink-500 relative overflow-hidden">
         <Image
           src={imageUrl || "/images/placeholder-event.jpg"}
@@ -76,7 +74,6 @@ export default function EventCard({
           placeholder="blur"
           blurDataURL="/images/placeholder-event-blur.jpg"
         />
-        {/* Indicador de seleção */}
         {isSelected && (
           <div className="absolute top-2 right-2 bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -90,7 +87,6 @@ export default function EventCard({
         )}
       </div>
 
-      {/* Event Info */}
       <div className="p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-2 line-clamp-2">
           {title}
@@ -102,7 +98,7 @@ export default function EventCard({
           <div className="flex items-center flex-shrink-0 ml-4">
             <div
               className={`w-3 h-3 ${currentStatus.color} rounded-full mr-2`}
-            ></div>
+            />
             <span className="text-sm text-gray-600">{currentStatus.label}</span>
           </div>
         </div>

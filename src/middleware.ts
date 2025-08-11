@@ -9,7 +9,7 @@ import {
 
 function getAllowedConnectSrcs() {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+    const apiUrl = process.env.API_URL || "http://localhost:3001";
     const urlObj = new URL(apiUrl);
     const apiHostname =
       urlObj.hostname + (urlObj.port ? `:${urlObj.port}` : "");
@@ -57,7 +57,8 @@ export function middleware(request: NextRequest) {
     response.headers.set("Content-Security-Policy", getAllowedConnectSrcs());
   }
 
-  const authToken = request.cookies.get("auth-token");
+  const authToken =
+    request.cookies.get("accessToken") ?? request.cookies.get("auth-token");
   const producerId = request.cookies.get("producer-id");
 
   // Verificar se tem tanto auth-token quanto producer-id
@@ -71,6 +72,8 @@ export function middleware(request: NextRequest) {
       new URL(ROUTES.REDIRECTS.LOGIN, request.url)
     );
     // Limpar cookies se não está autenticado
+    redirectResponse.cookies.delete("accessToken");
+    redirectResponse.cookies.delete("refreshToken");
     redirectResponse.cookies.delete("auth-token");
     redirectResponse.cookies.delete("refresh-token");
     redirectResponse.cookies.delete("producer-id");

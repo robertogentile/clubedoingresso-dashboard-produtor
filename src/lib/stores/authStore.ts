@@ -19,6 +19,7 @@ interface AuthActions {
   updateLastActivity: () => void;
   checkInactivity: () => boolean;
   syncWithCookies: () => void;
+  hydrate: (producer: Producer | null) => void;
 }
 
 // Configuração de timeout (em minutos)
@@ -83,6 +84,14 @@ export const useAuthStore = create<AuthState & AuthActions>()(
             lastActivity: null,
             selectedEvent: null,
           });
+        }
+      },
+
+      hydrate: (producer) => {
+        if (producer) {
+          set({ producer, isAuthenticated: true, lastActivity: Date.now() });
+        } else {
+          set({ producer: null, isAuthenticated: false });
         }
       },
 

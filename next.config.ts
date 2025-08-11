@@ -28,10 +28,7 @@ const nextConfig: NextConfig = {
             key: "X-Frame-Options",
             value: "SAMEORIGIN",
           },
-          {
-            key: "X-XSS-Protection",
-            value: "1; mode=block",
-          },
+          // Removido X-XSS-Protection por estar obsoleto
           {
             key: "Referrer-Policy",
             value: "strict-origin-when-cross-origin",
@@ -78,7 +75,7 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 dias
-    dangerouslyAllowSVG: true,
+    dangerouslyAllowSVG: false,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 };

@@ -1,44 +1,77 @@
 import axios, { AxiosError } from "axios";
 import { cookies } from "next/headers";
-import {
-  ApiErrorSchema,
-  type ApiErrorResponse,
-} from "@/lib/validations/errorSchema";
+import { refreshTokenAction } from "@/features/auth/actions";
 
-export const getApiServer = async () => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("accessToken")?.value;
-  const api = axios.create({ baseURL: process.env.API_URL });
-  if (token) {
-    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  }
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value: unknown) => void;
+  reject: (reason?: unknown) => void;
+}> = [];
+
+function processQueue(error: unknown, token: string | null = null) {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+}
+
+export const getApiServer = () => {
+  const api = axios.create({ baseURL: process.env.API_URL, timeout: 15000 });
+
+  api.interceptors.request.use(async (config) => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("accessToken")?.value;
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+    return config;
+  });
+
+  api.interceptors.response.use(
+    (response) => response,
+    async (error: AxiosError) => {
+      const originalRequest = error.config;
+      if (error.response?.status === 401 && originalRequest) {
+        if (isRefreshing) {
+          return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          })
+            .then((token) => {
+              if (typeof token === "string") {
+                originalRequest.headers = originalRequest.headers ?? {};
+                originalRequest.headers["Authorization"] = `Bearer ${token}`;
+              }
+              return api(originalRequest);
+            })
+            .catch((err) => Promise.reject(err));
+        }
+
+        isRefreshing = true;
+        try {
+          const newAccessToken = await refreshTokenAction();
+          if (newAccessToken) {
+            originalRequest.headers = originalRequest.headers ?? {};
+            originalRequest.headers[
+              "Authorization"
+            ] = `Bearer ${newAccessToken}`;
+            processQueue(null, newAccessToken);
+            return api(originalRequest);
+          }
+          return Promise.reject(error);
+        } catch (refreshError) {
+          processQueue(refreshError, null);
+          return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
+        }
+      }
+      return Promise.reject(error);
+    }
+  );
+
   return api;
 };
-
-// Helper central para requisições no servidor com validação do erro
-export async function serverRequest<TResponse = unknown>(
-  request: (api: Awaited<ReturnType<typeof getApiServer>>) => Promise<unknown>
-): Promise<TResponse> {
-  const api = await getApiServer();
-  try {
-    const response = (await request(api)) as unknown as { data?: unknown };
-    const payload = Object.prototype.hasOwnProperty.call(response, "data")
-      ? (response as { data: unknown }).data
-      : (response as unknown);
-    return payload as TResponse;
-  } catch (err) {
-    const error = err as AxiosError<ApiErrorResponse>;
-    const data = error.response?.data;
-    if (data) {
-      const parsed = ApiErrorSchema.safeParse(data);
-      if (parsed.success) {
-        throw new Error(parsed.data.error.message);
-      }
-      const maybeMessage = (data as unknown as { message?: string }).message;
-      if (typeof maybeMessage === "string") {
-        throw new Error(maybeMessage);
-      }
-    }
-    throw new Error("Erro na requisição ao servidor");
-  }
-}

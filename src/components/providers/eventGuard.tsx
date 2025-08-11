@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSelectedEvent } from "@/hooks/common";
+import { useSelectedEvent } from "@/features/events/hooks/useSelectedEvent";
 import { ROUTES } from "@/lib/config/routes";
 
 interface EventGuardProps {

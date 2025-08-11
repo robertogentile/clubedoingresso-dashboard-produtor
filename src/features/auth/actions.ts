@@ -4,7 +4,7 @@ import {
   LoginRequestSchema,
   LoginResponseSchema,
 } from "@/features/auth/schema";
-import { serverRequest } from "@/lib/api/server";
+import { getApiServer } from "@/lib/api/server";
 import { ROUTES } from "@/lib/config/routes";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -51,9 +51,9 @@ export async function loginAction(
   }
 
   try {
-    const responsePayload = await serverRequest((api) =>
-      api.post("/producer/login", validatedFields.data)
-    );
+    const api = getApiServer();
+    const response = await api.post("/producer/login", validatedFields.data);
+    const responsePayload = response.data;
 
     const validatedResponse = LoginResponseSchema.parse(responsePayload);
     const { access_token, refresh_token, ...producerData } =
@@ -73,21 +73,23 @@ export async function loginAction(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       path: "/",
-      sameSite: "lax",
+      sameSite: "strict",
+      maxAge: 60 * 15, // 15 minutos
     });
 
     cookieStore.set("refreshToken", refresh_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       path: "/",
-      sameSite: "lax",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 30, // 30 dias
     });
 
     cookieStore.set("producer-id", producerData.id, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       path: "/",
-      sameSite: "lax",
+      sameSite: "strict",
     });
 
     // Disponibilizar dados públicos do produtor para hidratar o Zustand via layout do servidor
@@ -191,5 +193,78 @@ export async function loginAction(
       errors: {},
       message: errorMessage,
     };
+  }
+}
+
+export async function logoutAction() {
+  const cookieStore = await cookies();
+
+  // Limpar todos os cookies de autenticação
+  cookieStore.delete("accessToken");
+  cookieStore.delete("refreshToken");
+  cookieStore.delete("auth-token");
+  cookieStore.delete("refresh-token");
+  cookieStore.delete("producer-id");
+  cookieStore.delete("producer");
+
+  // Retornar sucesso para o cliente redirecionar
+  return {
+    success: true,
+    redirectTo: ROUTES.REDIRECTS.LOGIN,
+  };
+}
+
+export async function refreshTokenAction(): Promise<string | null> {
+  const cookieStore = await cookies();
+  const refreshToken = cookieStore.get("refreshToken")?.value;
+  if (!refreshToken) {
+    await logoutAction();
+    return null;
+  }
+
+  try {
+    const api = getApiServer();
+    const response = await api.post("/producer/refresh-token", {
+      refresh_token: refreshToken,
+    });
+    type RefreshPayload =
+      | { accessToken: string; refreshToken: string }
+      | { data: { access_token: string; refresh_token: string } };
+    const data = response.data as RefreshPayload;
+    const newAccessToken =
+      "accessToken" in data
+        ? data.accessToken
+        : (data as { data: { access_token: string } }).data.access_token;
+    const newRefreshToken =
+      "refreshToken" in data
+        ? data.refreshToken
+        : (data as { data: { refresh_token: string } }).data.refresh_token;
+
+    if (!newAccessToken || !newRefreshToken) {
+      throw new Error("Tokens inválidos recebidos da API de refresh.");
+    }
+
+    cookieStore.set("accessToken", newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      sameSite: "strict",
+      maxAge: 60 * 15,
+    });
+
+    cookieStore.set("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 30,
+    });
+
+    return newAccessToken;
+  } catch {
+    try {
+      await logoutAction();
+    } catch {}
+    return null;
   }
 }

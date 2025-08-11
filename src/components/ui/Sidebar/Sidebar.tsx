@@ -18,7 +18,7 @@ import {
   IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuthStore } from "@/lib/stores/authStore";
-import { logoutAction } from "@/lib/actions/auth/logout";
+import { logoutAction } from "@/features/auth/actions";
 import { ROUTES } from "@/lib/config/routes";
 
 interface SidebarProps {

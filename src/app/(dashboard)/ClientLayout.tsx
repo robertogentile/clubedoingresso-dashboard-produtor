@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Sidebar, Header } from "@/components";
 import { useAuthStore } from "@/lib/stores/authStore";
-import { useInactivityMonitor } from "@/hooks/common/useInactivityMonitor";
+import { useRef } from "react";
 import type { Producer } from "@/lib/stores/types";
 
 interface ClientLayoutProps {
@@ -18,8 +18,57 @@ export default function ClientLayout({
   const [isLoading, setIsLoading] = useState(true);
   const { syncWithCookies, hydrate } = useAuthStore();
 
-  // Monitoramento de inatividade
-  useInactivityMonitor();
+  // Monitoramento de inatividade (inlined)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  useEffect(() => {
+    if (!useAuthStore.getState().isAuthenticated) return;
+
+    function debounce<T extends (...args: unknown[]) => void>(
+      func: T,
+      wait: number
+    ) {
+      let timeout: ReturnType<typeof setTimeout>;
+      return function executedFunction(...args: Parameters<T>) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    const debouncedUpdate = debounce(() => {
+      useAuthStore.getState().updateLastActivity();
+    }, 1000);
+
+    const checkActivity = () => {
+      const wasInactive = useAuthStore.getState().checkInactivity();
+      if (wasInactive) {
+        // handled by store logout flow
+      }
+    };
+
+    const activityEvents = [
+      "mousedown",
+      "keypress",
+      "click",
+      "touchstart",
+      "scroll",
+    ];
+    activityEvents.forEach((event) => {
+      document.addEventListener(event, debouncedUpdate, true);
+    });
+
+    intervalRef.current = setInterval(checkActivity, 5 * 60 * 1000);
+
+    return () => {
+      activityEvents.forEach((event) => {
+        document.removeEventListener(event, debouncedUpdate, true);
+      });
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;

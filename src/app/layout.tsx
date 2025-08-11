@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-import { QueryProvider, ToastProvider } from "@/components/providers";
+import { Providers } from "@/components/providers";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 export const metadata: Metadata = {
@@ -20,10 +20,9 @@ export default function RootLayout({
   return (
     <html lang="pt-br">
       <body>
-        <QueryProvider>
-          <ToastProvider />
+        <Providers>
           <ErrorBoundary>{children}</ErrorBoundary>
-        </QueryProvider>
+        </Providers>
       </body>
     </html>
   );

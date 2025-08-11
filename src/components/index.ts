@@ -5,4 +5,4 @@ export { default as Button } from "./ui/Button/Button";
 export { default as Input } from "./ui/Input/Input";
 export { default as Text } from "./ui/Text/Text";
 export { default as Link } from "./ui/Link/Link";
-export { EventGuard } from "./providers";
+export { default as EventGuard } from "./providers/eventGuard";

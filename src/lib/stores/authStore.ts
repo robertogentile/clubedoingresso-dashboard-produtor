@@ -110,7 +110,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
           state.logout();
           if (typeof window !== "undefined") {
             // Usar o mesmo padrão do logout manual
-            import("@/lib/actions/auth/logout").then(({ logoutAction }) => {
+            import("@/features/auth/actions").then(({ logoutAction }) => {
               logoutAction().then((result) => {
                 if (result.success && result.redirectTo) {
                   window.location.href = result.redirectTo;

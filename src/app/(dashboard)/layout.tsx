@@ -1,6 +1,7 @@
 import ClientLayout from "./ClientLayout";
 import type { Producer } from "@/lib/stores/types";
 import { cookies } from "next/headers";
+import { Providers } from "@/components/providers";
 
 export default async function AdminLayout({
   children,
@@ -22,6 +23,8 @@ export default async function AdminLayout({
   }
 
   return (
-    <ClientLayout initialProducer={initialProducer}>{children}</ClientLayout>
+    <Providers>
+      <ClientLayout initialProducer={initialProducer}>{children}</ClientLayout>
+    </Providers>
   );
 }

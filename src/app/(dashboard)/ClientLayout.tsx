@@ -16,7 +16,7 @@ export default function ClientLayout({
   initialProducer,
 }: ClientLayoutProps) {
   const [isLoading, setIsLoading] = useState(true);
-  const { syncWithCookies, hydrate } = useAuthStore();
+  const { syncWithCookies, hydrate, selectedEvent, producer } = useAuthStore();
 
   // Monitoramento de inatividade (inlined)
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -96,6 +96,11 @@ export default function ClientLayout({
     );
   }
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("pt-BR");
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="flex">
@@ -105,7 +110,27 @@ export default function ClientLayout({
           <Header />
 
           <main className="flex-1 p-8 bg-gray-background">
-            <div className="max-w-[1150px] mx-auto">{children}</div>
+            <div className="max-w-[1150px] mx-auto">
+              <div className="lg:hidden">
+                {selectedEvent ? (
+                  <div className=" rounded-lg ">
+                    <h2 className="text-base font-semibold text-primary truncate">
+                      {selectedEvent.name}
+                    </h2>
+                    <p className="text-sm text-secondary">
+                      {formatDate(selectedEvent.date)}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="rounded-lg">
+                    <p className="text-base text-primary">
+                      Olá, {producer?.fantasy_name || "Usuário"}!
+                    </p>
+                  </div>
+                )}
+              </div>
+              {children}
+            </div>
           </main>
         </div>
       </div>

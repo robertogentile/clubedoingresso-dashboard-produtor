@@ -41,14 +41,3 @@ export function isProtectedRoute(pathname: string): boolean {
 export function isPublicRoute(pathname: string): boolean {
   return ROUTES.PUBLIC.some((route) => pathname === route);
 }
-
-export function getMatcherConfig() {
-  return [
-    // Rotas protegidas
-    ...ROUTES.PROTECTED.map((route) => `${route}/:path*`),
-    // Rotas públicas
-    ...ROUTES.PUBLIC.map((route) => `${route}`),
-    // Outras rotas (exceto assets)
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
-  ];
-}

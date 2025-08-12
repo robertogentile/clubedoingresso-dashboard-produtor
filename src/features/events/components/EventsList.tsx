@@ -1,15 +1,19 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api/client";
 import EventCard from "./EventCard";
 import type { Event } from "@/features/events/schema";
 
 async function fetchEvents(producerId: string) {
-  const { data } = await apiClient.get("/producer/events", {
-    params: { producerId },
-  });
-  return data;
+  const res = await fetch(`/api/events?producerId=${producerId}`);
+  if (!res.ok) {
+    throw new Error("Falha ao buscar eventos através do nosso servidor.");
+  }
+  const json = await res.json();
+  if (!json.success) {
+    throw new Error(json.error || "Um erro ocorreu no servidor.");
+  }
+  return json.data;
 }
 
 interface EventsListProps {

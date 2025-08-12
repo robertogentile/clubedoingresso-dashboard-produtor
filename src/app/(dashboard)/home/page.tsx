@@ -18,7 +18,7 @@ async function getEvents() {
     `${process.env.API_URL}/producer/events?producerId=${producerId}`,
     {
       headers: { Authorization: `Bearer ${token}` },
-      next: { revalidate: 3600 },
+      cache: "no-store",
     }
   );
   if (!response.ok) {
@@ -34,7 +34,7 @@ export default async function HomePage() {
   const events = await getEvents();
 
   return (
-    <div className="px-4 py-6 sm:px-0">
+    <div className="px-0 py-6">
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Meus eventos</h2>
 

@@ -1,65 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import {
-  isProtectedRoute,
-  isPublicRoute,
-  ROUTES,
-  getMatcherConfig,
-} from "@/lib/config/routes";
-
-function getCspDirectives() {
-  try {
-    const apiUrl = process.env.API_URL || "http://localhost:3001";
-    const { hostname, port } = new URL(apiUrl);
-    const apiHostWithPort = hostname + (port ? `:${port}` : "");
-
-    const isProd = process.env.NODE_ENV === "production";
-
-    const connectSrc = isProd
-      ? [`'self'`, `https://${apiHostWithPort}`]
-      : [
-          `'self'`,
-          `http://${apiHostWithPort}`,
-          `https://${apiHostWithPort}`,
-          "http://localhost:3001",
-          "https://localhost:3001",
-          "http://localhost:3000",
-          "https://localhost:3000",
-        ];
-
-    const directives = [
-      "default-src 'self'",
-      // Sem inline/eval em produção
-      "script-src 'self'",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "font-src 'self' data: https://fonts.gstatic.com",
-      // Apenas https em produção
-      isProd
-        ? "img-src 'self' data: https:"
-        : "img-src 'self' data: https: http:",
-      `connect-src ${connectSrc.join(" ")}`,
-      "media-src 'self'",
-      "object-src 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-      "frame-ancestors 'none'",
-      ...(isProd ? ["upgrade-insecure-requests"] : []),
-    ].join("; ");
-
-    return directives;
-  } catch (error) {
-    console.error(error);
-    return "";
-  }
-}
+import { isProtectedRoute, isPublicRoute, ROUTES } from "@/lib/config/routes";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const response = NextResponse.next();
 
-  if (process.env.NODE_ENV === "production") {
-    response.headers.set("Content-Security-Policy", getCspDirectives());
-  }
+  // CSP temporariamente desabilitado até implementarmos nonce dinâmico
 
   const authToken =
     request.cookies.get("accessToken") ?? request.cookies.get("auth-token");
@@ -89,5 +36,19 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: getMatcherConfig(),
+  matcher: [
+    // Rotas protegidas
+    "/home/:path*",
+    "/dashboard/:path*",
+    "/relatorio/:path*",
+    "/financeiro/:path*",
+    "/administracao/:path*",
+    "/checkin/:path*",
+    "/perfil/:path*",
+    // Rotas públicas
+    "/login",
+    "/esqueci-senha",
+    // Outras rotas (exceto assets)
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+  ],
 };

@@ -6,6 +6,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const producerId = searchParams.get("producerId");
+    const search = searchParams.get("search");
 
     if (!producerId) {
       return NextResponse.json(
@@ -16,7 +17,10 @@ export async function GET(req: NextRequest) {
 
     const api = getApiServer();
     const response = await api.get("/producer/events", {
-      params: { producerId },
+      params: {
+        producerId,
+        ...(search ? { search } : {}),
+      },
     });
     const parsed = EventsResponseSchema.parse(response.data);
 

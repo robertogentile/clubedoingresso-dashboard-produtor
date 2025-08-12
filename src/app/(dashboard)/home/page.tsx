@@ -37,18 +37,6 @@ export default async function HomePage() {
     <div className="px-0 py-6">
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Meus eventos</h2>
-
-        {/* Search Bar */}
-        <div className="mb-6">
-          <div className="max-w-md">
-            <input
-              type="text"
-              placeholder="Buscar evento ou local"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              disabled
-            />
-          </div>
-        </div>
       </div>
 
       {/* Componente cliente hidratado com dados iniciais */}

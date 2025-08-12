@@ -1,5 +1,7 @@
 "use client";
 import Image from "next/image";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/config/routes";
@@ -76,13 +78,7 @@ export default function EventCard({
         />
         {isSelected && (
           <div className="absolute top-2 right-2 bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                clipRule="evenodd"
-              />
-            </svg>
+            <FontAwesomeIcon icon={faCheck} className="w-4 h-4" />
           </div>
         )}
       </div>

@@ -109,7 +109,7 @@ export default function ClientLayout({
         <div className="flex-1 flex flex-col">
           <Header />
 
-          <main className="flex-1 p-8 bg-gray-background">
+          <main className="flex-1 p-4 md:p-8 bg-gray-background">
             <div className="max-w-[1150px] mx-auto">
               <div className="lg:hidden">
                 {selectedEvent ? (

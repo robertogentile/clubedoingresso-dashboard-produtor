@@ -14,10 +14,12 @@
   --color-blue: #477bff;
   --color-lightGray: #e0e5f2;
   --color-error: #a60000;
-  --color-muted: #a3aed0;
   --color-darkGray: #111928;
   --color-gray-500: #6b7280;
   --color-gray-background: #f2f2f2;
+  --color-ativo: #126f00;
+  --color-oculto: #ffcc01;
+  --color-encerrado: #a3aed0;
 
   --text-10px: 0.625rem;
   --text-11px: 0.6875rem;

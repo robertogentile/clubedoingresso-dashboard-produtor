@@ -10,21 +10,15 @@ import type { Event } from "@/features/events/schema";
 
 async function fetchEvents(producerId: string, search?: string) {
   const params = new URLSearchParams({ producerId });
-  if (search && search.trim().length > 0) params.set("search", search.trim());
-
-  // Debug: log da URL sendo chamada
-  console.log("🔍 Buscando eventos:", `/api/events?${params.toString()}`);
-
+  if (search && search.trim().length > 0) {
+    params.set("search", search.trim());
+  }
   const res = await fetch(`/api/events?${params.toString()}`);
   if (!res.ok)
     throw new Error("Falha ao buscar eventos através do nosso servidor.");
   const json = await res.json();
   if (!json.success)
     throw new Error(json.error || "Um erro ocorreu no servidor.");
-
-  // Debug: log dos dados retornados
-  console.log("✅ Eventos retornados:", json.data);
-
   return json.data as { upcoming: Event[]; past: Event[] };
 }
 
@@ -44,14 +38,10 @@ export default function EventsList({
   const [searchInput, setSearchInput] = useState<string>("");
   const [searchParam, setSearchParam] = useState<string>("");
 
-  // Debug: log dos estados
-  console.log("🔍 Estados:", { searchInput, searchParam, activeTab });
-
   const {
     data: events,
     isLoading,
     error,
-    refetch,
   } = useQuery({
     queryKey: ["events", producerId, searchParam],
     queryFn: () => fetchEvents(producerId, searchParam),
@@ -67,30 +57,15 @@ export default function EventsList({
   );
 
   const submitSearch = useCallback(() => {
-    const normalized = searchInput.trim();
-    console.log("🚀 Submit search (Enter):", normalized);
-    setSearchParam(normalized);
-    refetch();
-  }, [searchInput, refetch]);
+    setSearchParam(searchInput.trim());
+  }, [searchInput]);
 
-  const clearIfEmpty = useCallback(() => {
-    const normalized = searchInput.trim();
-    console.log("🔍 Search on blur:", normalized);
-    setSearchParam(normalized);
-    refetch();
-  }, [searchInput, refetch]);
-
-  // Busca apenas no Enter e no blur - mais eficiente
-  // Removido debounce automático para evitar muitas requisições
+  const handleBlurSearch = useCallback(() => {
+    setSearchParam(searchInput.trim());
+  }, [searchInput]);
 
   return (
     <div>
-      {/* Debug info */}
-      <div className="mb-4 p-2 bg-gray-100 text-xs text-gray-600 rounded">
-        Debug: searchInput=&quot;{searchInput}&quot; | searchParam=&quot;
-        {searchParam}&quot; | Tab: {activeTab} | Eventos: {currentEvents.length}
-      </div>
-
       {/* Busca */}
       <div className="mb-6">
         <form
@@ -104,7 +79,7 @@ export default function EventsList({
             placeholder="Buscar evento ou local"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            onBlur={clearIfEmpty}
+            onBlur={handleBlurSearch}
             leftIcon={<FontAwesomeIcon icon={faMagnifyingGlass} />}
             inputSize="sm"
           />

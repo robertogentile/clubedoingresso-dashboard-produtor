@@ -5,6 +5,7 @@ import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/config/routes";
+import Text from "@/components/ui/Text/Text";
 
 interface EventCardProps {
   id: number;
@@ -31,16 +32,16 @@ export default function EventCard({
 
   const statusConfig = {
     Ativo: {
-      color: "bg-green-500",
+      color: "bg-ativo",
       label: "Ativo",
     },
     Oculto: {
-      color: "bg-yellow-500",
+      color: "bg-oculto",
       label: "Oculto",
     },
     Inativo: {
-      color: "bg-gray-500",
-      label: "Inativo",
+      color: "bg-encerrado",
+      label: "Encerrado",
     },
   } as const;
 
@@ -65,13 +66,13 @@ export default function EventCard({
       } ${className}`}
       onClick={handleSelectEvent}
     >
-      <div className="h-48 bg-gradient-to-r from-purple-500 to-pink-500 relative overflow-hidden">
+      <div className="h-[140px] md:h-[300px] bg-gradient-to-r from-purple-500 to-pink-500 relative overflow-hidden">
         <Image
           src={imageUrl || "/images/placeholder-event.jpg"}
           alt={title}
           fill
           className="w-full h-full object-cover"
-          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          sizes="(max-width: 768px) 140px, 300px"
           loading="lazy"
           placeholder="blur"
           blurDataURL="/images/placeholder-event-blur.jpg"
@@ -83,20 +84,36 @@ export default function EventCard({
         )}
       </div>
 
-      <div className="p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-2 line-clamp-2">
+      <div className="p-2 md:p-4">
+        <Text
+          size="12-16"
+          weight="700"
+          color="darkGray"
+          className="mb-2 line-clamp-2 min-h-[36px] md:min-h-[48px]"
+        >
           {title}
-        </h3>
-        <p className="text-sm text-gray-600 mb-4">{date}</p>
+        </Text>
 
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600 truncate">{location}</span>
-          <div className="flex items-center flex-shrink-0 ml-4">
-            <div
-              className={`w-3 h-3 ${currentStatus.color} rounded-full mr-2`}
-            />
-            <span className="text-sm text-gray-600">{currentStatus.label}</span>
-          </div>
+        <Text size="10-12" color="primary" className="mb-6 md:mb-8">
+          {date}
+        </Text>
+
+        <Text
+          size="12-16"
+          color="primary"
+          weight="700"
+          className="line-clamp-1 min-h-[24px] mb-2 md:mb-3"
+        >
+          {location}
+        </Text>
+
+        <div className="flex items-center">
+          <div
+            className={`w-4 h-4 md:w-7 md:h-7 ${currentStatus.color} rounded-full mr-2`}
+          />
+          <Text size="12-15" color="primary">
+            {currentStatus.label}
+          </Text>
         </div>
       </div>
     </div>

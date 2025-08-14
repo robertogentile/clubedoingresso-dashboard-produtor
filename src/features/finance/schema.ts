@@ -34,10 +34,10 @@ export const receiptsResponseSchema = z.array(receiptItemSchema);
 
 // GET /producer/payment-methods-resume
 export const paymentMethodItemSchema = z.object({
-  total: z.number(),
+  total: z.coerce.number(),
   payment_method: z.string(),
   installment_type: z.string(),
-  percentage: z.number(),
+  percentage: z.coerce.number(),
 });
 export const paymentMethodsResponseSchema = z.array(paymentMethodItemSchema);
 
@@ -61,8 +61,8 @@ export const sendSmsTokenResponseSchema = z.object({
 
 // GET /producer/pix
 export const pixKeySchema = z.object({
-  id: z.number(),
-  producerId: z.number(),
+  id: z.coerce.number(),
+  producerId: z.coerce.number(),
   name: z.string(),
   type: z.string(),
   value: z.string(),

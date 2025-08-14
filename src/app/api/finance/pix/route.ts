@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { getApiServer } from "@/lib/api/server";
 import {
   pixResponseSchema,
@@ -6,16 +7,27 @@ import {
   deletePixParamsSchema,
 } from "@/features/finance/schema";
 
+const querySchema = z.object({
+  producerId: z.coerce
+    .number()
+    .int()
+    .positive("producerId deve ser um número positivo."),
+});
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const producerId = searchParams.get("producerId");
-    if (!producerId) {
+    const parsed = querySchema.safeParse({
+      producerId: searchParams.get("producerId"),
+    });
+    if (!parsed.success) {
       return NextResponse.json(
-        { success: false, error: "producerId é obrigatório" },
+        { success: false, error: parsed.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
+
+    const { producerId } = parsed.data;
 
     const api = getApiServer();
     const { data: apiResponse } = await api.get("/producer/pix", {

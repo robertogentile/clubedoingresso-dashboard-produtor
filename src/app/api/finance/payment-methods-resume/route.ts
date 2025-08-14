@@ -1,17 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { getApiServer } from "@/lib/api/server";
 import { paymentMethodsResponseSchema } from "@/features/finance/schema";
+
+const querySchema = z.object({
+  eventId: z.coerce
+    .number()
+    .int()
+    .positive("eventId deve ser um número positivo."),
+});
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const eventId = searchParams.get("eventId");
-    if (!eventId) {
+    const parsed = querySchema.safeParse({
+      eventId: searchParams.get("eventId"),
+    });
+    if (!parsed.success) {
       return NextResponse.json(
-        { success: false, error: "eventId é obrigatório" },
+        { success: false, error: parsed.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
+
+    const { eventId } = parsed.data;
 
     const api = getApiServer();
     const { data: apiResponse } = await api.get(

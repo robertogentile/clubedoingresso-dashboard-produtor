@@ -19,6 +19,7 @@ export function usePix(producerId?: string | number | null) {
       );
       return res.data ?? [];
     },
+    retry: 1,
   });
 }
 

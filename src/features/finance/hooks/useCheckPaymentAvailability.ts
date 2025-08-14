@@ -18,5 +18,6 @@ export function useCheckPaymentAvailability(
       }>(`/api/finance/check-payment-availability${query}`);
       return res.data as CheckPaymentAvailability;
     },
+    retry: 1,
   });
 }

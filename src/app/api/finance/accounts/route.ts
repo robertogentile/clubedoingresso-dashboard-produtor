@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { getApiServer } from "@/lib/api/server";
 import {
   accountsResponseSchema,
@@ -6,16 +7,27 @@ import {
   deleteAccountParamsSchema,
 } from "@/features/finance/schema";
 
+const queryParamsSchema = z.object({
+  producerId: z.coerce
+    .number()
+    .int()
+    .positive("producerId deve ser um número positivo."),
+});
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const producerId = searchParams.get("producerId");
-    if (!producerId) {
+    const paramsValidation = queryParamsSchema.safeParse({
+      producerId: searchParams.get("producerId"),
+    });
+    if (!paramsValidation.success) {
       return NextResponse.json(
-        { success: false, error: "producerId é obrigatório" },
+        { success: false, error: paramsValidation.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
+
+    const { producerId } = paramsValidation.data;
 
     const api = getApiServer();
     const { data: apiResponse } = await api.get("/producer/accounts", {
@@ -38,7 +50,7 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true, data: validation.data });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { success: false, error: "Falha ao buscar as contas bancárias." },
       { status: 500 }

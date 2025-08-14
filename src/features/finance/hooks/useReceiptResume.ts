@@ -15,5 +15,6 @@ export function useReceiptResume(eventId?: string | number | null) {
       );
       return res.data as ReceiptResume;
     },
+    retry: 1,
   });
 }

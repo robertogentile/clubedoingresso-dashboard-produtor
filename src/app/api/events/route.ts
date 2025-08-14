@@ -1,19 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { getApiServer } from "@/lib/api/server";
 import { EventsResponseSchema } from "@/features/events/schema";
+
+const querySchema = z.object({
+  producerId: z.coerce
+    .number()
+    .int()
+    .positive("producerId deve ser um número positivo."),
+  search: z.string().optional(),
+});
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const producerId = searchParams.get("producerId");
-    const search = searchParams.get("search");
-
-    if (!producerId) {
+    const parsed = querySchema.safeParse({
+      producerId: searchParams.get("producerId"),
+      search: searchParams.get("search"),
+    });
+    if (!parsed.success) {
       return NextResponse.json(
-        { success: false, error: "producerId é obrigatório" },
+        { success: false, error: parsed.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
+
+    const { producerId, search } = parsed.data;
 
     const api = getApiServer();
     const response = await api.get("/producer/events", {
@@ -22,11 +34,10 @@ export async function GET(req: NextRequest) {
         ...(search ? { search } : {}),
       },
     });
-    const parsed = EventsResponseSchema.parse(response.data);
+    const parsedResponse = EventsResponseSchema.parse(response.data);
 
-    return NextResponse.json({ success: true, data: parsed.data });
-  } catch (error) {
-    console.error(error);
+    return NextResponse.json({ success: true, data: parsedResponse.data });
+  } catch {
     return NextResponse.json(
       { success: false, error: "Falha ao buscar os eventos no servidor." },
       { status: 500 }

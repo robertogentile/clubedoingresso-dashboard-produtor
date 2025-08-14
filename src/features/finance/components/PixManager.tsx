@@ -66,9 +66,19 @@ export function PixManager({
           </Text>
         )}
         {error && (
-          <Text size="14px" color="error">
-            Erro ao carregar chaves.
-          </Text>
+          <div className="bg-white border border-lightGray rounded-lg p-4 mt-3">
+            <Text size="14px" color="error">
+              Falha ao carregar chaves PIX.
+            </Text>
+            <div className="mt-3">
+              <button
+                className="text-blue underline"
+                onClick={() => window.location.reload()}
+              >
+                Tentar novamente
+              </button>
+            </div>
+          </div>
         )}
         {!isLoading && !error && (
           <ul className="divide-y divide-lightGray mt-3">

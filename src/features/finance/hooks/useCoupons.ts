@@ -15,5 +15,6 @@ export function useCoupons(eventId?: string | number | null) {
       );
       return res.data ?? [];
     },
+    retry: 1,
   });
 }

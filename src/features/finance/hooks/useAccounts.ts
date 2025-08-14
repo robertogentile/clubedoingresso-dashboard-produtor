@@ -19,6 +19,7 @@ export function useAccounts(producerId?: string | number | null) {
       );
       return res.data ?? [];
     },
+    retry: 1,
   });
 }
 

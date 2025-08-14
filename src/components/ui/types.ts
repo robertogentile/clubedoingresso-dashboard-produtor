@@ -77,6 +77,8 @@ export const colorMap: Record<string, string> = {
   error: "text-error",
   muted: "text-muted",
   darkGray: "text-darkGray",
+  gray400: "text-gray-400",
   gray500: "text-gray-500",
+  gray800: "text-gray-800",
   grayBackground: "text-gray-background",
 };

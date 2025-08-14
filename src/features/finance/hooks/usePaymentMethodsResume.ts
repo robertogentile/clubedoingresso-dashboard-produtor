@@ -16,5 +16,6 @@ export function usePaymentMethodsResume(eventId?: string | number | null) {
       }>(`/api/finance/payment-methods-resume${query}`);
       return res.data ?? [];
     },
+    retry: 1,
   });
 }

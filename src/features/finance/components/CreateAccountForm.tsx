@@ -1,5 +1,6 @@
 "use client";
-import { useFormState, useFormStatus } from "react-dom";
+import { useEffect, useRef, useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { createAccountAction } from "../actions";
 import Input from "@/components/ui/Input/Input";
 import Button from "@/components/ui/Button/Button";
@@ -21,13 +22,30 @@ interface FormState {
 }
 
 export function CreateAccountForm({ producerId }: { producerId: number }) {
-  const initialState: FormState = { message: "", success: false };
-  const [state, formAction] = useFormState(createAccountAction, initialState);
+  const initialState: FormState = {
+    message: "",
+    errors: {},
+    success: false,
+  };
+  const [state, formAction] = useActionState<FormState, FormData>(
+    createAccountAction as unknown as (
+      prevState: FormState,
+      formData: FormData
+    ) => Promise<FormState>,
+    initialState
+  );
   const storeProducerId = useAuthStore((s) => s.producer?.id);
   const effectiveProducerId = Number(storeProducerId ?? producerId ?? 0);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (state.success) {
+      formRef.current?.reset();
+    }
+  }, [state.success, state.message]);
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form ref={formRef} action={formAction} className="space-y-4">
       <input type="hidden" name="producerId" value={effectiveProducerId} />
 
       <Input
@@ -63,7 +81,9 @@ export function CreateAccountForm({ producerId }: { producerId: number }) {
 
       {state.message && (
         <p
-          className={`text-sm ${state.success ? "text-success" : "text-error"}`}
+          className={`mt-2 text-sm ${
+            state.success ? "text-success" : "text-error"
+          }`}
         >
           {state.message}
         </p>

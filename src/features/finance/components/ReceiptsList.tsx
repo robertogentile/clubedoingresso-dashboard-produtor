@@ -19,9 +19,19 @@ export function ReceiptsList({
 
   if (error) {
     return (
-      <Text size="14px" color="error">
-        Erro ao carregar recibos.
-      </Text>
+      <div className="bg-white border border-lightGray rounded-lg p-4">
+        <Text size="14px" color="error">
+          Falha ao carregar recibos.
+        </Text>
+        <div className="mt-3">
+          <button
+            className="text-blue underline"
+            onClick={() => window.location.reload()}
+          >
+            Tentar novamente
+          </button>
+        </div>
+      </div>
     );
   }
 

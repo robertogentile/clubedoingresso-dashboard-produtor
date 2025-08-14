@@ -102,7 +102,7 @@ export default function EventCard({
           size="12-16"
           color="primary"
           weight="700"
-          className="line-clamp-1 min-h-[24px] mb-2 md:mb-3"
+          className="line-clamp-1 min-h-[18px] md:min-h-[24px] mb-2 md:mb-3"
         >
           {location}
         </Text>

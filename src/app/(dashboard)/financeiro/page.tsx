@@ -1,6 +1,33 @@
 import { EventGuard } from "@/components";
+import { cookies } from "next/headers";
+import { CreateAccountForm } from "@/features/finance/components/CreateAccountForm";
+import { AccountsList } from "@/features/finance/components/AccountsList";
+import type { Account } from "@/features/finance/types";
 
-export default function FinanceiroPage() {
+async function getInitialAccounts(producerId: string): Promise<Account[]> {
+  const cookieStore = await cookies();
+  const res = await fetch(
+    `${
+      process.env.NEXT_PUBLIC_BASE_URL || ""
+    }/api/finance/accounts?producerId=${producerId}`,
+    {
+      headers: { Cookie: cookieStore.toString() },
+      cache: "no-store",
+    }
+  );
+  if (!res.ok) return [];
+  const json = await res.json();
+  return json.data || [];
+}
+
+export default async function FinanceiroPage() {
+  // Server components não acessam Zustand; o producerId será passado ao cliente pela árvore
+  const cookieStore = await cookies();
+  const producerIdFromCookie = cookieStore.get("producerId")?.value || "";
+  const initialAccounts = producerIdFromCookie
+    ? await getInitialAccounts(producerIdFromCookie)
+    : [];
+
   return (
     <EventGuard>
       <main className="flex-1 py-8 bg-gray-background">
@@ -48,6 +75,26 @@ export default function FinanceiroPage() {
                   <p className="text-2xl font-bold text-red-600">R$ 1.536,00</p>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Contas Bancárias */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div>
+              <h3 className="text-xl font-semibold mb-4">
+                Adicionar Nova Conta
+              </h3>
+              {/* No cliente, o producerId virá do Zustand; usamos um hidden server fallback */}
+              <CreateAccountForm
+                producerId={Number(producerIdFromCookie || 0)}
+              />
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold mb-4">Contas Cadastradas</h3>
+              <AccountsList
+                initialAccounts={initialAccounts}
+                producerId={producerIdFromCookie}
+              />
             </div>
           </div>
 

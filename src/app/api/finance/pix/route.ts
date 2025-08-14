@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getApiServer } from "@/lib/api/server";
-import { pixResponseSchema } from "@/features/finance/schema";
+import {
+  pixResponseSchema,
+  createPixSchema,
+  deletePixParamsSchema,
+} from "@/features/finance/schema";
 
 export async function GET(req: NextRequest) {
   try {
@@ -37,6 +41,60 @@ export async function GET(req: NextRequest) {
   } catch {
     return NextResponse.json(
       { success: false, error: "Falha ao buscar chaves PIX." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const parsed = createPixSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Payload inválido",
+          details: parsed.error.flatten(),
+        },
+        { status: 400 }
+      );
+    }
+    const api = getApiServer();
+    const { data } = await api.post("/producer/pix", parsed.data);
+    return NextResponse.json({ success: true, data: data.data });
+  } catch {
+    return NextResponse.json(
+      { success: false, error: "Falha ao criar chave PIX." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const params = {
+      producerId: searchParams.get("producerId") ?? "",
+      pixId: searchParams.get("pixId") ?? "",
+    };
+    const parsed = deletePixParamsSchema.safeParse(params);
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Parâmetros inválidos",
+          details: parsed.error.flatten(),
+        },
+        { status: 400 }
+      );
+    }
+    const api = getApiServer();
+    const { data } = await api.delete("/producer/pix", { params: parsed.data });
+    return NextResponse.json({ success: true, data: data.data });
+  } catch {
+    return NextResponse.json(
+      { success: false, error: "Falha ao remover chave PIX." },
       { status: 500 }
     );
   }

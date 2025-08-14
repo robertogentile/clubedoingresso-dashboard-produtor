@@ -91,3 +91,67 @@ export const promoterItemSchema = z.object({
   batch_name: z.string(),
 });
 export const promotersResponseSchema = z.array(promoterItemSchema);
+
+// POST /producer/pix
+export const createPixSchema = z.object({
+  producerId: z.number(),
+  name: z.string().min(3, "Nome inválido"),
+  type: z.string().min(1, "Tipo inválido"),
+  key: z.string().min(3, "Chave inválida"),
+});
+
+// DELETE /producer/pix
+export const deletePixParamsSchema = z.object({
+  producerId: z.string().min(1),
+  pixId: z.string().min(1),
+});
+
+// DELETE /producer/account
+export const deleteAccountParamsSchema = z.object({
+  producerId: z.string().min(1),
+  accountId: z.string().min(1),
+});
+
+// POST /producer/create-request-payment
+const requestPaymentBaseSchema = z.object({
+  accountType: z.string(),
+  producerId: z.number(),
+  eventId: z.number(),
+  producer: z.string(),
+  email: z.string(),
+  event: z.string(),
+  value: z.string().min(2),
+  name: z.string().min(5),
+  description: z.string().min(5),
+  token: z.string().min(1),
+});
+
+export const requestPaymentAccountSchema = requestPaymentBaseSchema.extend({
+  accountType: z.literal("account"),
+  document: z.string().min(3),
+  bank: z.string().min(1),
+  agency: z.string().min(1),
+  account: z.string().min(1),
+});
+
+export const requestPaymentPixSchema = requestPaymentBaseSchema.extend({
+  accountType: z.literal("pix"),
+  type: z.string().min(1),
+  key: z.string().min(5),
+});
+
+export const requestPaymentNewSchema = requestPaymentBaseSchema.extend({
+  accountType: z.literal("new"),
+  document: z.string().min(1),
+  bank: z.string().min(1),
+  agency: z.string().min(1),
+  account: z.string().min(1),
+  key: z.string().min(1),
+  type: z.string().min(1),
+});
+
+export const requestPaymentSchema = z.discriminatedUnion("accountType", [
+  requestPaymentAccountSchema,
+  requestPaymentPixSchema,
+  requestPaymentNewSchema,
+]);

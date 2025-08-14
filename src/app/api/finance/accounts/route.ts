@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getApiServer } from "@/lib/api/server";
-import { accountsResponseSchema } from "@/features/finance/schema";
+import {
+  accountsResponseSchema,
+  createAccountSchema,
+  deleteAccountParamsSchema,
+} from "@/features/finance/schema";
 
 export async function GET(req: NextRequest) {
   try {
@@ -37,6 +41,64 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { success: false, error: "Falha ao buscar as contas bancárias." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const parsed = createAccountSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Payload inválido",
+          details: parsed.error.flatten(),
+        },
+        { status: 400 }
+      );
+    }
+
+    const api = getApiServer();
+    const { data } = await api.post("/producer/account", parsed.data);
+    return NextResponse.json({ success: true, data: data.data });
+  } catch {
+    return NextResponse.json(
+      { success: false, error: "Falha ao criar a conta bancária." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const params = {
+      producerId: searchParams.get("producerId") ?? "",
+      accountId: searchParams.get("accountId") ?? "",
+    };
+    const parsed = deleteAccountParamsSchema.safeParse(params);
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Parâmetros inválidos",
+          details: parsed.error.flatten(),
+        },
+        { status: 400 }
+      );
+    }
+
+    const api = getApiServer();
+    const { data } = await api.delete("/producer/account", {
+      params: parsed.data,
+    });
+    return NextResponse.json({ success: true, data: data.data });
+  } catch {
+    return NextResponse.json(
+      { success: false, error: "Falha ao remover a conta bancária." },
       { status: 500 }
     );
   }

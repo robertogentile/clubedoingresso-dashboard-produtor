@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getApiServer } from "@/lib/api/server";
 import { requestPaymentSchema } from "@/features/finance/schema";
+import { z } from "zod";
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,7 +12,7 @@ export async function POST(req: NextRequest) {
         {
           success: false,
           error: "Payload inválido",
-          details: parsed.error.flatten(),
+          details: z.flattenError(parsed.error).fieldErrors,
         },
         { status: 400 }
       );

@@ -20,7 +20,10 @@ export async function GET(req: NextRequest) {
     });
     if (!parsed.success) {
       return NextResponse.json(
-        { success: false, error: parsed.error.flatten().fieldErrors },
+        {
+          success: false,
+          error: z.flattenError(parsed.error).fieldErrors,
+        },
         { status: 400 }
       );
     }

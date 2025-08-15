@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { getApiServer } from "@/lib/api/server";
 import { createAccountSchema } from "./schema";
 import type { CreateAccountPayload } from "./types";
+import { z } from "zod";
 
 interface FormState {
   message: string;
@@ -30,9 +31,7 @@ export async function createAccountAction(
   if (!validatedFields.success) {
     return {
       message: "Erro de validação. Por favor, corrija os campos.",
-      errors: validatedFields.error.flatten().fieldErrors as Partial<
-        Record<keyof CreateAccountPayload, string[]>
-      >, // sinaliza falha
+      errors: z.flattenError(validatedFields.error).fieldErrors,
       success: false,
     };
   }

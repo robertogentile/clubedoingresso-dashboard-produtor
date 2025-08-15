@@ -22,7 +22,10 @@ export async function GET(req: NextRequest) {
     });
     if (!paramsValidation.success) {
       return NextResponse.json(
-        { success: false, error: paramsValidation.error.flatten().fieldErrors },
+        {
+          success: false,
+          error: z.flattenError(paramsValidation.error).fieldErrors,
+        },
         { status: 400 }
       );
     }
@@ -67,7 +70,7 @@ export async function POST(req: NextRequest) {
         {
           success: false,
           error: "Payload inválido",
-          details: parsed.error.flatten(),
+          details: z.flattenError(parsed.error).fieldErrors,
         },
         { status: 400 }
       );
@@ -97,7 +100,7 @@ export async function DELETE(req: NextRequest) {
         {
           success: false,
           error: "Parâmetros inválidos",
-          details: parsed.error.flatten(),
+          details: z.flattenError(parsed.error).fieldErrors,
         },
         { status: 400 }
       );

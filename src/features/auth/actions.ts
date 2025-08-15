@@ -8,6 +8,7 @@ import { getApiServer } from "@/lib/api/server";
 import { ROUTES } from "@/lib/config/routes";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { z } from "zod";
 
 interface LoginState {
   errors?: Record<string, string[]>;
@@ -45,7 +46,7 @@ export async function loginAction(
 
   if (!validatedFields.success) {
     return {
-      errors: validatedFields.error.flatten().fieldErrors,
+      errors: z.flattenError(validatedFields.error).fieldErrors,
       message: null,
     };
   }

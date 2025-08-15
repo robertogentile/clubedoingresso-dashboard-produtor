@@ -11,6 +11,7 @@ import { PixManager } from "@/features/finance/components/PixManager";
 import { CreateAccountForm } from "@/features/finance/components/CreateAccountForm";
 import { AccountsList } from "@/features/finance/components/AccountsList";
 import type { Account } from "@/features/finance/types";
+import Text from "@/components/ui/Text/Text";
 
 interface FinancePageProps {
   producerId: string;
@@ -49,12 +50,6 @@ export function FinancePage({ producerId, initialAccounts }: FinancePageProps) {
                 <div className="bg-white rounded-[20px] shadow">
                   <PaymentMethodsChart eventId={eventId} />
                 </div>
-                <div className="bg-white p-6 rounded-lg shadow">
-                  <h3 className="text-lg font-medium text-gray-900 mb-6">
-                    Recibos
-                  </h3>
-                  <ReceiptsList eventId={eventId} />
-                </div>
               </div>
             );
           }
@@ -92,6 +87,26 @@ export function FinancePage({ producerId, initialAccounts }: FinancePageProps) {
                       producerId={producerId}
                     />
                   </div>
+                </div>
+              </div>
+            );
+          }
+          if (screen === "details") {
+            return (
+              <div>
+                <button className="text-primary" onClick={goBack}>
+                  {"< Voltar"}
+                </button>
+                <div className="bg-white p-6 rounded-lg shadow">
+                  <Text
+                    size="16-20"
+                    weight="700"
+                    color="primary"
+                    className="mb-4"
+                  >
+                    Movimentações
+                  </Text>
+                  <ReceiptsList eventId={eventId} />
                 </div>
               </div>
             );

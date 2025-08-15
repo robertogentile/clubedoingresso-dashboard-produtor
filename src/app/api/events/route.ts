@@ -16,11 +16,11 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const parsed = querySchema.safeParse({
       producerId: searchParams.get("producerId"),
-      search: searchParams.get("search"),
+      search: searchParams.get("search") ?? undefined,
     });
     if (!parsed.success) {
       return NextResponse.json(
-        { success: false, error: parsed.error.flatten().fieldErrors },
+        { success: false, error: z.flattenError(parsed.error).fieldErrors },
         { status: 400 }
       );
     }

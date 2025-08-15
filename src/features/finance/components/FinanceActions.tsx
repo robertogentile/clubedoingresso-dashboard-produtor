@@ -23,11 +23,11 @@ function ActionButton({ label, icon, onClick }: ActionButtonProps) {
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center justify-center text-secondary border-2 border-secondary rounded-xl bg-white hover:bg-gray-50 transition-colors w-[110px] h-[110px] p-1 cursor-pointer"
+      className="group flex flex-col items-center justify-center text-secondary hover:text-white border-2 border-secondary rounded-xl bg-white hover:bg-secondary transition-colors w-[110px] h-[110px] p-1 cursor-pointer"
     >
       <FontAwesomeIcon
         icon={icon}
-        className="text-primary mb-2"
+        className="text-secondary group-hover:text-white mb-2 transition-colors"
         style={{
           width: "24px",
           height: "24px",
@@ -84,7 +84,7 @@ export function FinanceActions({
   };
 
   return (
-    <div className="grid md:justify-between justify-evenly grid-cols-[repeat(2,max-content)] md:grid-cols-[repeat(4,max-content)] xl:grid-cols-[repeat(8,max-content)] gap-y-4 w-full">
+    <div className="grid justify-evenly md:justify-between grid-cols-[repeat(2,max-content)] md:grid-cols-[repeat(4,max-content)] xl:grid-cols-[repeat(8,max-content)] gap-y-4 w-full">
       <ActionButton
         label="Ver detalhes"
         icon={faEye}

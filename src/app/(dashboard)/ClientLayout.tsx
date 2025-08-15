@@ -113,7 +113,7 @@ export default function ClientLayout({
             <div className="max-w-[1150px] mx-auto">
               <div className="lg:hidden">
                 {selectedEvent ? (
-                  <div className=" rounded-lg ">
+                  <div className=" rounded-lg mb-4">
                     <h2 className="text-base font-semibold text-primary truncate">
                       {selectedEvent.name}
                     </h2>
@@ -122,7 +122,7 @@ export default function ClientLayout({
                     </p>
                   </div>
                 ) : (
-                  <div className="rounded-lg">
+                  <div className="rounded-lg mb-4">
                     <p className="text-base text-primary">
                       Olá, {producer?.fantasy_name || "Usuário"}!
                     </p>

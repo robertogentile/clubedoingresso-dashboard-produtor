@@ -2,8 +2,7 @@
 import Button from "@/components/ui/Button/Button";
 import Text from "@/components/ui/Text/Text";
 import { useModal } from "@/components/ui/Modal/ModalProvider";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import ActionButton from "@/components/ui/ActionButton/ActionButton";
 import {
   faEye,
   faSackDollar,
@@ -12,37 +11,6 @@ import {
   faTicket,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
-
-interface ActionButtonProps {
-  label: string;
-  icon: IconDefinition;
-  onClick: () => void;
-}
-
-function ActionButton({ label, icon, onClick }: ActionButtonProps) {
-  return (
-    <button
-      onClick={onClick}
-      className="group flex flex-col items-center justify-center text-secondary hover:text-white border-2 border-secondary rounded-xl bg-white hover:bg-secondary transition-colors w-[110px] h-[110px] p-1 cursor-pointer"
-    >
-      <FontAwesomeIcon
-        icon={icon}
-        className="text-secondary group-hover:text-white mb-2 transition-colors"
-        style={{
-          width: "24px",
-          height: "24px",
-        }}
-      />
-      <Text
-        size="14px"
-        weight="500"
-        className="text-center leading-tight min-h-[38px]"
-      >
-        {label}
-      </Text>
-    </button>
-  );
-}
 
 export type FinanceScreenId =
   | "home"

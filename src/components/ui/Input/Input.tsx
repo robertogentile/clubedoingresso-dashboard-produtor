@@ -3,7 +3,9 @@ import {
   ReactNode,
   cloneElement,
   isValidElement,
+  useCallback,
 } from "react";
+import { inputMasks, type InputMaskName } from "@/lib/utils/masks";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -17,6 +19,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   inputClassName?: string;
   labelClassName?: string;
   rounded?: boolean;
+  mask?: InputMaskName; // máscara opcional
 }
 
 export default function Input({
@@ -31,6 +34,7 @@ export default function Input({
   inputClassName = "",
   labelClassName = "",
   rounded = true,
+  mask,
   id,
   ...props
 }: InputProps) {
@@ -75,8 +79,8 @@ export default function Input({
     ${roundedClass}
     ${borderStyles}
     ${focusStyles}
-    ${leftIcon ? "all:pl-10" : ""}
-    ${rightIcon ? "all:pr-10" : ""}
+    ${leftIcon ? "all:pl-10" : "all:pl-4"}
+    ${rightIcon ? "all:pr-10" : "all:pr-4"}
     text-primary disabled:opacity-50 disabled:cursor-not-allowed
     ${inputClassName}
   `
@@ -89,6 +93,33 @@ export default function Input({
       ? "1px solid var(--color-error)"
       : "1px solid var(--color-primary)",
   };
+
+  const handleMaskedChange = useCallback<NonNullable<InputProps["onChange"]>>(
+    (e) => {
+      if (!mask) {
+        props.onChange?.(e);
+        return;
+      }
+      const apply = inputMasks[mask];
+      if (!apply) {
+        props.onChange?.(e);
+        return;
+      }
+      const target = e.target as HTMLInputElement;
+      const original = target.value;
+      const masked = apply(original);
+      if (masked !== original) {
+        // Atualiza o valor do input mantendo caret o mais próximo possível (ajuste simples)
+        const selectionStart = target.selectionStart ?? masked.length;
+        target.value = masked;
+        try {
+          target.setSelectionRange(selectionStart, selectionStart);
+        } catch {}
+      }
+      props.onChange?.(e);
+    },
+    [mask, props]
+  );
 
   return (
     <div className={className}>
@@ -111,6 +142,14 @@ export default function Input({
           className={inputClasses}
           style={inputStyle}
           aria-invalid={hasError}
+          inputMode={
+            mask
+              ? mask === "currencyUSD" || mask === "currencyBRL"
+                ? "numeric"
+                : "numeric"
+              : props.inputMode
+          }
+          onChange={handleMaskedChange}
           aria-describedby={
             hasError
               ? `${inputId}-error`

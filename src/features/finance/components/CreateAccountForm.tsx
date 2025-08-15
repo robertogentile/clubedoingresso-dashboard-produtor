@@ -2,15 +2,31 @@
 import { useEffect, useRef, useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { createAccountAction } from "../actions";
-import Input from "@/components/ui/Input/Input";
-import Button from "@/components/ui/Button/Button";
+import { Input, Button, Select } from "@/components";
 import { useAuthStore } from "@/lib/stores/authStore";
+import { faUser, faBuildingColumns } from "@fortawesome/free-solid-svg-icons";
+
+import {
+  faMoneyBill1,
+  faCircleUser,
+} from "@fortawesome/free-regular-svg-icons";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { banksList } from "@/lib/helpers/banks";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" loading={pending} disabled={pending}>
-      {pending ? "Salvando..." : "Salvar conta"}
+    <Button
+      variant="primary"
+      size="lg"
+      type="submit"
+      loading={pending}
+      disabled={pending}
+      className="w-full md:w-auto px-8"
+      leftIcon={<FontAwesomeIcon icon={faBuildingColumns} />}
+    >
+      {pending ? "Salvando..." : "Cadastrar conta corrente"}
     </Button>
   );
 }
@@ -45,38 +61,59 @@ export function CreateAccountForm({ producerId }: { producerId: number }) {
   }, [state.success, state.message]);
 
   return (
-    <form ref={formRef} action={formAction} className="space-y-4">
+    <form
+      ref={formRef}
+      action={formAction}
+      className="space-y-4 mb-12 max-w-[600px]"
+    >
       <input type="hidden" name="producerId" value={effectiveProducerId} />
 
       <Input
         name="name"
-        label="Titular"
-        placeholder="Nome do titular"
+        label="Razão social ou nome completo do titular"
+        placeholder="Razão social ou nome"
+        leftIcon={<FontAwesomeIcon icon={faUser} />}
+        required
+        autoComplete="name"
+        autoFocus
         error={state.errors?.name?.[0]}
       />
       <Input
         name="document"
-        label="Documento (CPF/CNPJ)"
-        placeholder="00000000000"
+        label="CPF ou CNPJ"
+        placeholder="Informe CPF ou CNPJ"
+        leftIcon={<FontAwesomeIcon icon={faCircleUser} />}
+        mask="cpfCnpj"
         error={state.errors?.document?.[0]}
+        required
+        autoComplete="document"
       />
-      <Input
+      <Select
         name="bank"
         label="Banco"
-        placeholder="Itaú"
-        error={state.errors?.bank?.[0]}
+        placeholder="Selecione um banco"
+        options={banksList}
+        defaultValue={""}
+        required
       />
       <Input
         name="agency"
         label="Agência"
-        placeholder="0001"
+        placeholder="Número da agência"
+        leftIcon={<FontAwesomeIcon icon={faBuildingColumns} />}
         error={state.errors?.agency?.[0]}
+        required
+        autoComplete="agency"
       />
       <Input
         name="account"
-        label="Conta"
-        placeholder="123456"
+        label="Conta corrente"
+        placeholder="Número da conta corrente"
+        leftIcon={<FontAwesomeIcon icon={faMoneyBill1} />}
         error={state.errors?.account?.[0]}
+        required
+        autoComplete="account"
+        className="mb-8"
       />
 
       {state.message && (

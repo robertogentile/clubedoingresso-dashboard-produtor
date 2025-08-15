@@ -35,7 +35,7 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 outline-none disabled:opacity-50 disabled:cursor-not-allowed active:transform active:scale-95";
+    "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 outline-none disabled:opacity-50 disabled:cursor-not-allowed active:transform active:scale-95 cursor-pointer";
 
   const variants = {
     primary:
@@ -60,16 +60,16 @@ export default function Button({
   } as const;
 
   const sizes = {
-    sm: "py-1.5 text-12px md:text-13px",
-    md: "py-2 md:py-3 text-12px md:text-14px",
-    lg: "py-2 md:py-3 text-14px md:text-16px",
-    xl: "py-4 text-16px md:text-18px",
+    sm: "p-1.5 text-12px md:text-13px",
+    md: "p-2 md:p-3 text-12px md:text-14px",
+    lg: "p-2 md:p-3 px-4 md:px-8 text-14px md:text-16px",
+    xl: "p-4 text-16px md:text-18px",
   };
 
   const widthClass = fullWidth ? "w-full" : "";
   const loadingClass = loading ? "cursor-wait" : "";
 
-  const classes = `${baseStyles} ${variants[variant]} ${sizes[size]} ${widthClass} ${loadingClass} ${className}`;
+  const classes = `${baseStyles} ${className} ${variants[variant]} ${sizes[size]} ${widthClass} ${loadingClass} `;
 
   return (
     <button className={classes} disabled={disabled || loading} {...props}>

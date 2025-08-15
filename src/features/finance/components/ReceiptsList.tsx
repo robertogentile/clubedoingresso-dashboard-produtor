@@ -1,6 +1,7 @@
 "use client";
 import { useReceipts } from "@/features/finance/hooks/useReceipts";
 import Text from "@/components/ui/Text/Text";
+import Button from "@/components/ui/Button/Button";
 
 export function ReceiptsList({
   eventId,
@@ -37,52 +38,56 @@ export function ReceiptsList({
 
   if (!data || data.length === 0) {
     return (
-      <Text size="14px" color="gray">
+      <Text size="16px" color="primary" className="text-center p-4">
         Nenhum recibo encontrado.
       </Text>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-lightGray bg-white">
-      <div className="grid grid-cols-4 gap-4 px-4 py-3 bg-gray-100">
-        <Text size="12px" weight="600">
-          Data
-        </Text>
-        <Text size="12px" weight="600">
-          Descrição
-        </Text>
-        <Text size="12px" weight="600">
-          Valor
-        </Text>
-        <Text size="12px" weight="600">
-          Comprovante
-        </Text>
-      </div>
-      <ul className="divide-y divide-lightGray">
-        {data.map((item) => (
-          <li
+    <div className="space-y-4">
+      {data.map((item) => {
+        const hasReceipt = Boolean(item.receipt && String(item.receipt).trim());
+        return (
+          <div
             key={item.id}
-            className="grid grid-cols-1 md:grid-cols-4 gap-4 px-4 py-3"
+            className="bg-white rounded-[16px] border border-lightGray shadow-sm overflow-hidden w-full"
           >
-            <Text size="12px" className="md:col-span-1">
-              {item.date}
-            </Text>
-            <Text size="12px" className="md:col-span-1">
-              {item.description}
-            </Text>
-            <Text size="12px" className="md:col-span-1">
-              {item.value.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
-            </Text>
-            <Text size="12px" className="md:col-span-1">
-              {item.receipt ? "Disponível" : "-"}
-            </Text>
-          </li>
-        ))}
-      </ul>
+            <div className="p-4 md:p-5">
+              <div className="flex items-start justify-between gap-4">
+                <Text size="24-28-34" weight="700" color="primary">
+                  {item.value.toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  })}
+                </Text>
+                <Text size="12-16" color="primary">
+                  {item.date}
+                </Text>
+              </div>
+              <Text size="16-20" className="mt-2 text-primary">
+                {item.description}
+              </Text>
+              {hasReceipt && (
+                <div className="flex justify-end">
+                  <Button
+                    variant="primary"
+                    onClick={() =>
+                      window.open(
+                        String(item.receipt),
+                        "_blank",
+                        "noopener,noreferrer"
+                      )
+                    }
+                  >
+                    Ver comprovante
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

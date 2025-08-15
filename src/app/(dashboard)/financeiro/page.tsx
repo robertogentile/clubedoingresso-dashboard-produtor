@@ -28,7 +28,7 @@ export default async function FinanceiroPage() {
 
   return (
     <EventGuard>
-      <main className="flex-1 py-8 bg-gray-background">
+      <main className="flex-1 bg-gray-background">
         <FinancePage
           producerId={producerIdFromCookie}
           initialAccounts={initialAccounts}

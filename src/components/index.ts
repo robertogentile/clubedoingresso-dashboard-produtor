@@ -6,3 +6,6 @@ export { default as Input } from "./ui/Input/Input";
 export { default as Text } from "./ui/Text/Text";
 export { default as Link } from "./ui/Link/Link";
 export { default as EventGuard } from "./providers/eventGuard";
+export { default as ActionButton } from "./ui/ActionButton/ActionButton";
+export { default as ButtonBack } from "./ui/ButtonBack/ButtonBack";
+export { default as Select } from "./ui/Select/Select";

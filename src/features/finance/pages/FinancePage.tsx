@@ -11,8 +11,7 @@ import { PixAdd } from "@/features/finance/components/PixAdd";
 import { PixList } from "@/features/finance/components/PixList";
 import { CreateAccountForm } from "@/features/finance/components/CreateAccountForm";
 import { AccountsList } from "@/features/finance/components/AccountsList";
-import Text from "@/components/ui/Text/Text";
-import ButtonBack from "@/components/ui/ButtonBack/ButtonBack";
+import { Text, ButtonBack } from "@/components";
 
 export function FinancePage() {
   return (

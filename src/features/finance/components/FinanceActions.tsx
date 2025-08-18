@@ -1,8 +1,6 @@
 "use client";
-import Button from "@/components/ui/Button/Button";
-import Text from "@/components/ui/Text/Text";
-import { useModal } from "@/components/ui/Modal/ModalProvider";
-import ActionButton from "@/components/ui/ActionButton/ActionButton";
+import { Button, Text, ActionButton } from "@/components";
+import { useModal } from "@/components/providers/ModalProvider";
 import {
   faEye,
   faSackDollar,

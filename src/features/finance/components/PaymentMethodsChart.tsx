@@ -1,6 +1,6 @@
 "use client";
 import { usePaymentMethodsResume } from "@/features/finance/hooks/usePaymentMethodsResume";
-import Text from "@/components/ui/Text/Text";
+import { Text } from "@/components";
 import { VictoryPie } from "victory";
 import {} from "react";
 

@@ -2,7 +2,7 @@
 import { useEffect, useRef, useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { createAccountAction } from "../actions";
-import { Input, Button, Select } from "@/components";
+import { Input, Button, Select, Text } from "@/components";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { faUser, faBuildingColumns } from "@fortawesome/free-solid-svg-icons";
 
@@ -13,6 +13,7 @@ import {
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { banksList } from "@/lib/helpers/banks";
+import { useModal } from "@/components/providers/ModalProvider";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -53,12 +54,40 @@ export function CreateAccountForm(/*{ producerId }: { producerId: number }*/) {
   const storeProducerId = useAuthStore((s) => s.producer?.id);
   const effectiveProducerId = Number(storeProducerId ?? 0);
   const formRef = useRef<HTMLFormElement>(null);
+  const { open, close } = useModal();
 
   useEffect(() => {
     if (state.success) {
       formRef.current?.reset();
+      open(
+        <div className="text-center">
+          <Text size="18-20" weight="700" color="primary" className="mb-4">
+            Sucesso!
+          </Text>
+          <Text size="14-16" color="primary" className="mb-6">
+            Conta corrente cadastrada com sucesso!
+          </Text>
+          <Button variant="primary" onClick={close} className="px-8">
+            OK
+          </Button>
+        </div>
+      );
+    } else if (state.message && !state.success) {
+      open(
+        <div className="text-center">
+          <Text size="18-20" weight="700" color="error" className="mb-4">
+            Erro
+          </Text>
+          <Text size="14-16" color="primary" className="mb-6">
+            {state.message}
+          </Text>
+          <Button variant="primary" onClick={close} className="px-8">
+            OK
+          </Button>
+        </div>
+      );
     }
-  }, [state.success, state.message]);
+  }, [state.success, state.message, open, close]);
 
   return (
     <form
@@ -114,16 +143,6 @@ export function CreateAccountForm(/*{ producerId }: { producerId: number }*/) {
         autoComplete="account"
         className="mb-8"
       />
-
-      {state.message && (
-        <p
-          className={`mt-2 text-sm ${
-            state.success ? "text-success" : "text-error"
-          }`}
-        >
-          {state.message}
-        </p>
-      )}
 
       <SubmitButton />
     </form>

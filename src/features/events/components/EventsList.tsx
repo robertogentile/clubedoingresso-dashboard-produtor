@@ -4,8 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import Input from "@/components/ui/Input/Input";
-import EventCard from "./EventCard";
+import { Input, EventCard } from "@/components";
 import type { Event } from "@/features/events/schema";
 
 async function fetchEvents(producerId: string, search?: string) {

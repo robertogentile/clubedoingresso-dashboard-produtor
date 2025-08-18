@@ -1,8 +1,7 @@
 "use client";
 import { usePix, useDeletePix } from "@/features/finance/hooks/usePix";
-import Button from "@/components/ui/Button/Button";
-import Text from "@/components/ui/Text/Text";
-import { useModal } from "@/components/ui/Modal/ModalProvider";
+import { Button, Text } from "@/components";
+import { useModal } from "@/components/providers/ModalProvider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
 import { useAuthStore } from "@/lib/stores/authStore";
@@ -37,7 +36,58 @@ export function PixList() {
             onClick={() =>
               deletePix.mutate(
                 { producerId: String(effectiveProducerId), pixId },
-                { onSuccess: () => close() }
+                {
+                  onSuccess: () => {
+                    close();
+                    open(
+                      <div className="text-center">
+                        <Text
+                          size="18-20"
+                          weight="700"
+                          color="primary"
+                          className="mb-4"
+                        >
+                          Sucesso!
+                        </Text>
+                        <Text size="14-16" color="primary" className="mb-6">
+                          Chave PIX excluída com sucesso!
+                        </Text>
+                        <Button
+                          variant="primary"
+                          onClick={close}
+                          className="px-8"
+                        >
+                          OK
+                        </Button>
+                      </div>
+                    );
+                  },
+                  onError: () => {
+                    close();
+                    open(
+                      <div className="text-center">
+                        <Text
+                          size="18-20"
+                          weight="700"
+                          color="error"
+                          className="mb-4"
+                        >
+                          Erro
+                        </Text>
+                        <Text size="14-16" color="primary" className="mb-6">
+                          Erro ao excluir chave PIX. Tente novamente.
+                        </Text>
+                        <Button
+                          variant="primary"
+                          onClick={close}
+                          className="px-8"
+                        >
+                          OK
+                        </Button>
+                      </div>
+                    );
+                  },
+                }
               )
             }
             loading={deletePix.isPending}

@@ -5,7 +5,7 @@ import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useAuthStore } from "@/lib/stores/authStore";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/config/routes";
-import Text from "@/components/ui/Text/Text";
+import { Text } from "@/components";
 
 interface EventCardProps {
   id: number;

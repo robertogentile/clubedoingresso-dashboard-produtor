@@ -1,7 +1,6 @@
 "use client";
 import { useReceipts } from "@/features/finance/hooks/useReceipts";
-import Text from "@/components/ui/Text/Text";
-import Button from "@/components/ui/Button/Button";
+import { Button, Text } from "@/components";
 
 export function ReceiptsList({
   eventId,

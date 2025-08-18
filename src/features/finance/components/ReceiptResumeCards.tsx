@@ -1,6 +1,6 @@
 "use client";
 import { useReceiptResume } from "@/features/finance/hooks/useReceiptResume";
-import Text from "@/components/ui/Text/Text";
+import { Text } from "@/components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDollarSign, faTicket } from "@fortawesome/free-solid-svg-icons";
 

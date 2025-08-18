@@ -6,7 +6,9 @@ export type InputMaskName =
   | "cep"
   | "currencyBRL"
   | "currencyUSD"
-  | "numeric";
+  | "numeric"
+  | "email"
+  | "alphanumeric";
 
 function onlyDigits(value: string): string {
   return (value || "").replace(/\D+/g, "");
@@ -43,6 +45,8 @@ export const inputMasks: Record<InputMaskName, (value: string) => string> = {
   currencyBRL: maskCurrencyBRL,
   currencyUSD: maskCurrencyUSD,
   numeric: onlyDigits,
+  email: maskEmail,
+  alphanumeric: maskAlphanumeric,
 };
 
 // Phone: (99) 99999-9999 or (99) 9999-9999
@@ -89,4 +93,18 @@ export const masksUtils = {
   maskCep,
   maskCurrencyBRL,
   maskCurrencyUSD,
+  maskEmail,
+  maskAlphanumeric,
 };
+
+// Email: remove espaços e caracteres inválidos; força minúsculas
+function maskEmail(value: string): string {
+  const v = (value || "").replace(/\s+/g, "");
+  // permite letras, números e símbolos comuns de e-mail
+  return v.replace(/[^a-zA-Z0-9@._%+-]/g, "").toLowerCase();
+}
+
+// Alfanumérico: apenas letras e números
+function maskAlphanumeric(value: string): string {
+  return (value || "").replace(/[^a-zA-Z0-9]/g, "");
+}

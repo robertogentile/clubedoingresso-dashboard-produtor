@@ -7,25 +7,20 @@ import {
   FinanceActions,
   FinanceScreenId,
 } from "@/features/finance/components/FinanceActions";
-import { PixManager } from "@/features/finance/components/PixManager";
+import { PixAdd } from "@/features/finance/components/PixAdd";
+import { PixList } from "@/features/finance/components/PixList";
 import { CreateAccountForm } from "@/features/finance/components/CreateAccountForm";
 import { AccountsList } from "@/features/finance/components/AccountsList";
-import type { Account } from "@/features/finance/types";
 import Text from "@/components/ui/Text/Text";
 import ButtonBack from "@/components/ui/ButtonBack/ButtonBack";
 
-interface FinancePageProps {
-  producerId: string;
-  initialAccounts: Account[];
-}
-
-export function FinancePage({ producerId, initialAccounts }: FinancePageProps) {
+export function FinancePage() {
   return (
     <div className="mb-8">
       <ScreenNavigator
         initial="home"
         render={(screen, navigate, goBack) => {
-          const eventId = undefined; // resolvido pelos hooks via Zustand
+          const eventId = undefined;
           if (screen === "home") {
             return (
               <div className="space-y-8">
@@ -81,11 +76,57 @@ export function FinancePage({ producerId, initialAccounts }: FinancePageProps) {
               </div>
             );
           }
-          if (screen === "pix-create" || screen === "pix-list") {
+          if (screen === "pix-create") {
             return (
               <div className="space-y-6">
-                <ButtonBack label="Voltar" onClick={goBack} />
-                <PixManager producerId={producerId} />
+                <ButtonBack
+                  label="Cadastrar chave PIX"
+                  sizeLabel="16-20-24"
+                  onClick={goBack}
+                />
+                <PixAdd />
+                <FinanceActions
+                  onNavigate={(s: FinanceScreenId) =>
+                    navigate(
+                      s as unknown as
+                        | "home"
+                        | "details"
+                        | "pix-create"
+                        | "pix-list"
+                        | "account-create"
+                        | "account-list"
+                        | "coupons"
+                        | "promoters"
+                    )
+                  }
+                />
+              </div>
+            );
+          }
+          if (screen === "pix-list") {
+            return (
+              <div className="space-y-6">
+                <ButtonBack
+                  label="Chaves PIX"
+                  sizeLabel="16-20-24"
+                  onClick={goBack}
+                />
+                <PixList />
+                <FinanceActions
+                  onNavigate={(s: FinanceScreenId) =>
+                    navigate(
+                      s as unknown as
+                        | "home"
+                        | "details"
+                        | "pix-create"
+                        | "pix-list"
+                        | "account-create"
+                        | "account-list"
+                        | "coupons"
+                        | "promoters"
+                    )
+                  }
+                />
               </div>
             );
           }
@@ -97,7 +138,7 @@ export function FinancePage({ producerId, initialAccounts }: FinancePageProps) {
                   sizeLabel="16-20-24"
                   onClick={goBack}
                 />
-                <CreateAccountForm producerId={Number(producerId || 0)} />
+                <CreateAccountForm />
 
                 <FinanceActions
                   onNavigate={(s: FinanceScreenId) =>
@@ -120,16 +161,17 @@ export function FinancePage({ producerId, initialAccounts }: FinancePageProps) {
           if (screen === "account-list") {
             return (
               <div className="space-y-6">
-                <ButtonBack label="Voltar" onClick={goBack} />
+                <ButtonBack
+                  label="Voltar"
+                  sizeLabel="16-20-24"
+                  onClick={goBack}
+                />
                 <div className="grid grid-cols-1">
                   <div>
                     <h3 className="text-xl font-semibold mb-4">
                       Contas cadastradas
                     </h3>
-                    <AccountsList
-                      initialAccounts={initialAccounts}
-                      producerId={producerId}
-                    />
+                    <AccountsList />
                   </div>
                 </div>
               </div>

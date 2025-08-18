@@ -1,4 +1,6 @@
 "use client";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   ReactNode,
   createContext,
@@ -107,7 +109,14 @@ function ModalRoot({
           className="absolute right-3 top-3 text-gray-700 hover:text-primary"
           onClick={onClose}
         >
-          ×
+          <FontAwesomeIcon
+            icon={faXmark}
+            className="text-primary hover:cursor-pointer"
+            style={{
+              width: "32px",
+              height: "32px",
+            }}
+          />
         </button>
         {children}
       </div>

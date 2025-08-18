@@ -6,11 +6,11 @@ import ActionButton from "@/components/ui/ActionButton/ActionButton";
 import {
   faEye,
   faSackDollar,
-  faQrcode,
   faBuildingColumns,
   faTicket,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
+import { faPix } from "@fortawesome/free-brands-svg-icons";
 
 export type FinanceScreenId =
   | "home"
@@ -65,7 +65,7 @@ export function FinanceActions({
       />
       <ActionButton
         label="Cadastrar PIX"
-        icon={faQrcode}
+        icon={faPix}
         onClick={() => onNavigate("pix-create")}
       />
       <ActionButton
@@ -80,7 +80,7 @@ export function FinanceActions({
       />
       <ActionButton
         label="Consultar/ excluir PIX"
-        icon={faQrcode}
+        icon={faPix}
         onClick={() => onNavigate("pix-list")}
       />
       <ActionButton

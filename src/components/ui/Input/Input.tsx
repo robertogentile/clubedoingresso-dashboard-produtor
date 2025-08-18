@@ -107,14 +107,25 @@ export default function Input({
       }
       const target = e.target as HTMLInputElement;
       const original = target.value;
+      const cursorPosition = target.selectionStart ?? 0;
       const masked = apply(original);
+
       if (masked !== original) {
-        // Atualiza o valor do input mantendo caret o mais próximo possível (ajuste simples)
-        const selectionStart = target.selectionStart ?? masked.length;
+        // Calcula a nova posição do cursor baseada na diferença de tamanho
+        const lengthDiff = masked.length - original.length;
+        const newCursorPosition = Math.min(
+          masked.length,
+          Math.max(0, cursorPosition + lengthDiff)
+        );
+
         target.value = masked;
-        try {
-          target.setSelectionRange(selectionStart, selectionStart);
-        } catch {}
+
+        // Usa setTimeout para garantir que o valor seja atualizado antes de posicionar o cursor
+        setTimeout(() => {
+          try {
+            target.setSelectionRange(newCursorPosition, newCursorPosition);
+          } catch {}
+        }, 0);
       }
       props.onChange?.(e);
     },
@@ -143,10 +154,17 @@ export default function Input({
           style={inputStyle}
           aria-invalid={hasError}
           inputMode={
-            mask
-              ? mask === "currencyUSD" || mask === "currencyBRL"
-                ? "numeric"
-                : "numeric"
+            mask === "currencyUSD" ||
+            mask === "currencyBRL" ||
+            mask === "numeric" ||
+            mask === "cpf" ||
+            mask === "cnpj" ||
+            mask === "cpfCnpj"
+              ? "numeric"
+              : mask === "phone" || mask === "cep"
+              ? "tel"
+              : mask === "email"
+              ? "email"
               : props.inputMode
           }
           onChange={handleMaskedChange}

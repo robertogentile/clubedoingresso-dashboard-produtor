@@ -12,19 +12,12 @@ async function fetchAccounts(producerId: string): Promise<Account[]> {
   return json.data || [];
 }
 
-export function AccountsList({
-  initialAccounts,
-  producerId,
-}: {
-  initialAccounts: Account[];
-  producerId: string;
-}) {
+export function AccountsList() {
   const storeProducerId = useAuthStore((s) => s.producer?.id);
-  const effectiveProducerId = String(storeProducerId ?? producerId ?? "");
+  const effectiveProducerId = String(storeProducerId ?? "");
   const { data } = useQuery({
     queryKey: ["accounts", effectiveProducerId],
     queryFn: () => fetchAccounts(effectiveProducerId),
-    initialData: initialAccounts,
   });
 
   if (!data || data.length === 0) {

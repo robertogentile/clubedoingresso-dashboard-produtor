@@ -37,7 +37,7 @@ interface FormState {
   success: boolean;
 }
 
-export function CreateAccountForm({ producerId }: { producerId: number }) {
+export function CreateAccountForm(/*{ producerId }: { producerId: number }*/) {
   const initialState: FormState = {
     message: "",
     errors: {},
@@ -51,7 +51,7 @@ export function CreateAccountForm({ producerId }: { producerId: number }) {
     initialState
   );
   const storeProducerId = useAuthStore((s) => s.producer?.id);
-  const effectiveProducerId = Number(storeProducerId ?? producerId ?? 0);
+  const effectiveProducerId = Number(storeProducerId ?? 0);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -86,7 +86,6 @@ export function CreateAccountForm({ producerId }: { producerId: number }) {
         mask="cpfCnpj"
         error={state.errors?.document?.[0]}
         required
-        autoComplete="document"
       />
       <Select
         name="bank"

@@ -32,7 +32,7 @@ export default function PerfilPage() {
               <div className="flex items-center mb-2">
                 <FontAwesomeIcon
                   icon={faUser}
-                  className="w-5 h-5 text-gray-400 mr-2"
+                  className="w-5 h-5 text-secondary mr-2"
                 />
                 <Text size="16px" weight="bold" className="text-secondary">
                   Contato
@@ -47,7 +47,7 @@ export default function PerfilPage() {
               <div className="flex items-center mb-2">
                 <FontAwesomeIcon
                   icon={faBuilding}
-                  className="w-5 h-5 text-gray-400 mr-2"
+                  className="w-5 h-5 text-secondary mr-2"
                 />
                 <Text size="16px" weight="bold" className="text-secondary">
                   Nome fantasia
@@ -62,7 +62,7 @@ export default function PerfilPage() {
               <div className="flex items-center mb-2">
                 <FontAwesomeIcon
                   icon={faPhone}
-                  className="w-5 h-5 text-gray-400 mr-2"
+                  className="w-5 h-5 text-secondary mr-2"
                 />
                 <Text size="16px" weight="bold" className="text-secondary">
                   Celular
@@ -77,7 +77,7 @@ export default function PerfilPage() {
               <div className="flex items-center mb-2">
                 <FontAwesomeIcon
                   icon={faEnvelope}
-                  className="w-5 h-5 text-gray-400 mr-2"
+                  className="w-5 h-5 text-secondary mr-2"
                 />
                 <Text size="16px" weight="bold" className="text-secondary">
                   E-mail

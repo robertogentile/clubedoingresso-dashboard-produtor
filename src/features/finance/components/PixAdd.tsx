@@ -1,6 +1,6 @@
 "use client";
 import { useCreatePix } from "@/features/finance/hooks/usePix";
-import { Input, Button, Select, Text } from "@/components";
+import { Input, Button, Select } from "@/components";
 import { pixTypes } from "@/lib/helpers/chavesPix";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import type { InputMaskName } from "@/lib/utils/masks";
@@ -30,7 +30,7 @@ export function PixAdd() {
   const createPix = useCreatePix();
   const storeProducerId = useAuthStore((s) => s.producer?.id);
   const effectiveProducerId = Number(storeProducerId ?? 0);
-  const { open, close } = useModal();
+  const { showAlert } = useModal();
   const [form, setForm] = useState({
     name: "",
     type: "",
@@ -69,34 +69,18 @@ export function PixAdd() {
       {
         onSuccess: () => {
           setForm({ name: "", type: "", key: "" });
-          open(
-            <div className="text-center">
-              <Text size="18-20" weight="700" color="primary" className="mb-4">
-                Sucesso!
-              </Text>
-              <Text size="14-16" color="primary" className="mb-6">
-                Chave PIX cadastrada com sucesso!
-              </Text>
-              <Button variant="primary" onClick={close} className="px-8">
-                OK
-              </Button>
-            </div>
-          );
+          showAlert({
+            type: "success",
+            title: "Sucesso!",
+            description: "Chave PIX cadastrada com sucesso!",
+          });
         },
         onError: (error) => {
-          open(
-            <div className="text-center">
-              <Text size="18-20" weight="700" color="error" className="mb-4">
-                Erro
-              </Text>
-              <Text size="14-16" color="primary" className="mb-6">
-                Erro ao cadastrar chave PIX. Tente novamente.
-              </Text>
-              <Button variant="primary" onClick={close} className="px-8">
-                OK
-              </Button>
-            </div>
-          );
+          showAlert({
+            type: "error",
+            title: "Erro",
+            description: "Erro ao cadastrar chave PIX. Tente novamente.",
+          });
           console.error("Erro ao criar PIX:", error);
         },
       }

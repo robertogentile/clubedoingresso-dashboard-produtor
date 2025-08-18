@@ -1,5 +1,11 @@
 "use client";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faXmark,
+  faCheck,
+  faExclamationTriangle,
+  faInfo,
+  faTimes,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   ReactNode,
@@ -11,11 +17,28 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { Button, Text } from "@/components";
+
+type AlertType = "success" | "error" | "warning" | "info";
+
+interface AlertButton {
+  text: string;
+  icon?: typeof faCheck;
+  onClick?: () => void;
+}
+
+interface AlertOptions {
+  type: AlertType;
+  title: string;
+  description: string;
+  button?: AlertButton;
+}
 
 interface ModalContextValue {
   isOpen: boolean;
   open: (content: ReactNode) => void;
   close: () => void;
+  showAlert: (options: AlertOptions) => void;
 }
 
 const ModalContext = createContext<ModalContextValue | null>(null);
@@ -54,9 +77,131 @@ export function ModalProvider({ children }: { children: ReactNode }) {
     lockScroll(false);
   }, [lockScroll]);
 
+  const getAlertConfig = useCallback((type: AlertType) => {
+    const configs = {
+      success: {
+        icon: faCheck,
+        titleColor: "success" as const,
+        iconColor: "text-success",
+      },
+      error: {
+        icon: faTimes,
+        titleColor: "error" as const,
+        iconColor: "text-error",
+      },
+      warning: {
+        icon: faExclamationTriangle,
+        titleColor: "oculto" as const,
+        iconColor: "text-oculto",
+      },
+      info: {
+        icon: faInfo,
+        titleColor: "primary" as const,
+        iconColor: "text-primary",
+      },
+    };
+    return configs[type];
+  }, []);
+
+  const showAlert = useCallback(
+    (options: AlertOptions) => {
+      /*
+      // Exemplo básico - sucesso
+      showAlert({
+        type: "success",
+        title: "Sucesso!",
+        description: "Operação realizada com sucesso!"
+      });
+
+      // Exemplo com botão customizado e callback
+      showAlert({
+        type: "error", 
+        title: "Erro",
+        description: "Algo deu errado. Tente novamente.",
+        button: {
+          text: "Tentar Novamente",
+          icon: faRefresh, // Ícone opcional
+          onClick: () => {
+            // Ação customizada
+            console.log("Tentando novamente...");
+          }
+        }
+      });
+
+      // Exemplo warning
+      showAlert({
+        type: "warning",
+        title: "Atenção",
+        description: "Esta ação não pode ser desfeita."
+      });
+
+      // Exemplo info
+      showAlert({
+        type: "info", 
+        title: "Informação",
+        description: "Dados atualizados automaticamente."
+      });
+      */
+      const config = getAlertConfig(options.type);
+      const buttonText = options.button?.text || "OK";
+      const buttonIcon = options.button?.icon;
+      const buttonCallback = options.button?.onClick;
+
+      const handleButtonClick = () => {
+        if (buttonCallback) {
+          buttonCallback();
+        }
+        close();
+      };
+
+      const alertContent = (
+        <div className="text-center">
+          <div className="flex justify-center mb-4">
+            <FontAwesomeIcon
+              icon={config.icon}
+              className={`${config.iconColor} text-24px`}
+            />
+          </div>
+          <Text
+            size="16-20-24"
+            weight="700"
+            color={config.titleColor}
+            className="text-center mb-2"
+          >
+            {options.title}
+          </Text>
+          <Text size="12-16" color="primary" className="text-center mb-6">
+            {options.description}
+          </Text>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleButtonClick}
+            className="px-8 flex items-center gap-2 min-w-[120px]"
+          >
+            {buttonIcon && (
+              <FontAwesomeIcon
+                icon={buttonIcon}
+                className="text-white"
+                style={{ width: "16px", height: "16px" }}
+              />
+            )}
+            {buttonText}
+          </Button>
+        </div>
+      );
+
+      open(alertContent);
+    },
+    [open, close, getAlertConfig]
+  );
+
   useEffect(() => () => lockScroll(false), [lockScroll]);
 
-  const value = useMemo(() => ({ isOpen, open, close }), [isOpen, open, close]);
+  const value = useMemo(
+    () => ({ isOpen, open, close, showAlert }),
+    [isOpen, open, close, showAlert]
+  );
 
   return (
     <ModalContext.Provider value={value}>

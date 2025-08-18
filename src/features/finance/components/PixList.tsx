@@ -11,9 +11,12 @@ export function PixList() {
   const effectiveProducerId = Number(storeProducerId ?? 0);
   const { data, isLoading, error } = usePix(effectiveProducerId);
   const deletePix = useDeletePix();
-  const { open, close } = useModal();
+  const { showAlert, open, close } = useModal();
 
   function confirmDelete(pixId: string, label: string) {
+    // Primeiro, ainda usamos o modal customizado para confirmação (pois tem dois botões)
+    // Mas vamos usar showAlert para sucesso e erro
+
     open(
       <div>
         <Text
@@ -39,53 +42,20 @@ export function PixList() {
                 {
                   onSuccess: () => {
                     close();
-                    open(
-                      <div className="text-center">
-                        <Text
-                          size="18-20"
-                          weight="700"
-                          color="primary"
-                          className="mb-4"
-                        >
-                          Sucesso!
-                        </Text>
-                        <Text size="14-16" color="primary" className="mb-6">
-                          Chave PIX excluída com sucesso!
-                        </Text>
-                        <Button
-                          variant="primary"
-                          onClick={close}
-                          className="px-8"
-                        >
-                          OK
-                        </Button>
-                      </div>
-                    );
+                    showAlert({
+                      type: "success",
+                      title: "Sucesso!",
+                      description: "Chave PIX excluída com sucesso!",
+                    });
                   },
                   onError: () => {
                     close();
-                    open(
-                      <div className="text-center">
-                        <Text
-                          size="18-20"
-                          weight="700"
-                          color="error"
-                          className="mb-4"
-                        >
-                          Erro
-                        </Text>
-                        <Text size="14-16" color="primary" className="mb-6">
-                          Erro ao excluir chave PIX. Tente novamente.
-                        </Text>
-                        <Button
-                          variant="primary"
-                          onClick={close}
-                          className="px-8"
-                        >
-                          OK
-                        </Button>
-                      </div>
-                    );
+                    showAlert({
+                      type: "error",
+                      title: "Erro",
+                      description:
+                        "Erro ao excluir chave PIX. Tente novamente.",
+                    });
                   },
                 }
               )

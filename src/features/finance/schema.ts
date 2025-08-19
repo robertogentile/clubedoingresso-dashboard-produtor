@@ -53,12 +53,6 @@ export const checkPaymentAvailabilityResponseSchema = z.object({
   antecipation: z.boolean(),
 });
 
-// GET /producer/send-sms-token
-export const sendSmsTokenResponseSchema = z.object({
-  id: z.string(),
-  token: z.number(),
-});
-
 // GET /producer/pix
 export const pixKeySchema = z.object({
   id: z.coerce.number(),

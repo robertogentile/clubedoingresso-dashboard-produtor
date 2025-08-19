@@ -9,3 +9,4 @@ export { default as EventGuard } from "./providers/eventGuard";
 export { default as ActionButton } from "./ui/ActionButton/ActionButton";
 export { default as ButtonBack } from "./ui/ButtonBack/ButtonBack";
 export { default as Select } from "./ui/Select/Select";
+export { default as Switch } from "./ui/Switch/Switch";

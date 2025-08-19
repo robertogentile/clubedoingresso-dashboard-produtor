@@ -1,5 +1,4 @@
 "use client";
-import { useCreatePix } from "@/features/finance/hooks/usePix";
 import { Input, Button, Select } from "@/components";
 import { pixTypes } from "@/lib/helpers/chavesPix";
 import { FormEvent, useEffect, useMemo, useState } from "react";
@@ -9,6 +8,8 @@ import { useAuthStore } from "@/lib/stores/authStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPix } from "@fortawesome/free-brands-svg-icons";
 import { useModal } from "@/components/providers/ModalProvider";
+import { createPixAction } from "@/features/finance/actions";
+import { useInvalidatePix } from "@/features/finance/hooks/usePix";
 
 function SubmitButton({ isLoading }: { isLoading: boolean }) {
   return (
@@ -27,10 +28,10 @@ function SubmitButton({ isLoading }: { isLoading: boolean }) {
 }
 
 export function PixAdd() {
-  const createPix = useCreatePix();
   const storeProducerId = useAuthStore((s) => s.producer?.id);
   const effectiveProducerId = Number(storeProducerId ?? 0);
   const { showAlert } = useModal();
+  const { invalidatePix } = useInvalidatePix();
   const [form, setForm] = useState({
     name: "",
     type: "",
@@ -59,32 +60,29 @@ export function PixAdd() {
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
-    createPix.mutate(
-      {
-        producerId: effectiveProducerId,
-        name: form.name,
-        type: form.type,
-        key: form.key,
-      },
-      {
-        onSuccess: () => {
-          setForm({ name: "", type: "", key: "" });
-          showAlert({
-            type: "success",
-            title: "Sucesso!",
-            description: "Chave PIX cadastrada com sucesso!",
-          });
-        },
-        onError: (error) => {
-          showAlert({
-            type: "error",
-            title: "Erro",
-            description: "Erro ao cadastrar chave PIX. Tente novamente.",
-          });
-          console.error("Erro ao criar PIX:", error);
-        },
+    const fd = new FormData();
+    fd.set("producerId", String(effectiveProducerId));
+    fd.set("name", form.name);
+    fd.set("type", form.type);
+    fd.set("key", form.key);
+    createPixAction({ message: "", success: false }, fd).then((res) => {
+      if (res.success) {
+        setForm({ name: "", type: "", key: "" });
+        // Invalidar o cache para atualizar a lista
+        invalidatePix(effectiveProducerId);
+        showAlert({
+          type: "success",
+          title: "Sucesso!",
+          description: "Chave PIX cadastrada com sucesso!",
+        });
+      } else {
+        showAlert({
+          type: "error",
+          title: "Erro",
+          description: res.message || "Erro ao cadastrar chave PIX.",
+        });
       }
-    );
+    });
   }
 
   return (
@@ -127,7 +125,7 @@ export function PixAdd() {
           className="mb-8 md:mb-12"
         />
 
-        <SubmitButton isLoading={createPix.isPending} />
+        <SubmitButton isLoading={false} />
       </form>
     </div>
   );

@@ -14,6 +14,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { banksList } from "@/lib/helpers/banks";
 import { useModal } from "@/components/providers/ModalProvider";
+import { useInvalidateAccounts } from "@/features/finance/hooks/useAccounts";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -55,10 +56,13 @@ export function CreateAccountForm() {
   const effectiveProducerId = Number(storeProducerId ?? 0);
   const formRef = useRef<HTMLFormElement>(null);
   const { showAlert } = useModal();
+  const { invalidateAccounts } = useInvalidateAccounts();
 
   useEffect(() => {
     if (state.success) {
       formRef.current?.reset();
+      // Invalidar o cache para atualizar a lista
+      invalidateAccounts(effectiveProducerId);
       showAlert({
         type: "success",
         title: "Sucesso!",
@@ -71,7 +75,13 @@ export function CreateAccountForm() {
         description: state.message,
       });
     }
-  }, [state.success, state.message, showAlert]);
+  }, [
+    state.success,
+    state.message,
+    showAlert,
+    invalidateAccounts,
+    effectiveProducerId,
+  ]);
 
   return (
     <form

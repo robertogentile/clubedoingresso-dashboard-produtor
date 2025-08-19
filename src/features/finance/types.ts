@@ -6,7 +6,6 @@ import {
   paymentMethodItemSchema,
   receiptResumeResponseSchema,
   checkPaymentAvailabilityResponseSchema,
-  sendSmsTokenResponseSchema,
   pixKeySchema,
   couponItemSchema,
   promoterItemSchema,
@@ -24,7 +23,6 @@ export type ReceiptResume = z.infer<typeof receiptResumeResponseSchema>;
 export type CheckPaymentAvailability = z.infer<
   typeof checkPaymentAvailabilityResponseSchema
 >;
-export type SmsToken = z.infer<typeof sendSmsTokenResponseSchema>;
 export type PixKey = z.infer<typeof pixKeySchema>;
 export type CouponItem = z.infer<typeof couponItemSchema>;
 export type PromoterItem = z.infer<typeof promoterItemSchema>;

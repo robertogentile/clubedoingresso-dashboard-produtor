@@ -6,15 +6,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
 import {
   useAccounts,
-  useDeleteAccount,
+  useInvalidateAccounts,
 } from "@/features/finance/hooks/useAccounts";
+import { deleteAccountAction } from "@/features/finance/actions";
 
 export function AccountsList() {
   const storeProducerId = useAuthStore((s) => s.producer?.id);
   const effectiveProducerId = Number(storeProducerId ?? 0);
   const { data, isLoading, error } = useAccounts(effectiveProducerId);
-  const deleteAccount = useDeleteAccount();
   const { showAlert, open, close } = useModal();
+  const { invalidateAccounts } = useInvalidateAccounts();
 
   function confirmDelete(accountId: string, label: string) {
     open(
@@ -36,38 +37,35 @@ export function AccountsList() {
         <div className="flex items-center justify-center gap-3">
           <Button
             variant="primary"
-            onClick={() =>
-              deleteAccount.mutate(
-                { producerId: String(effectiveProducerId), accountId },
-                {
-                  onSuccess: () => {
-                    close();
+            onClick={() => {
+              const fd = new FormData();
+              fd.set("producerId", String(effectiveProducerId));
+              fd.set("accountId", accountId);
+              deleteAccountAction({ message: "", success: false }, fd).then(
+                (res) => {
+                  close();
+                  if (res.success) {
+                    // Invalidar o cache para atualizar a lista
+                    invalidateAccounts(effectiveProducerId);
                     showAlert({
                       type: "success",
                       title: "Sucesso!",
                       description: "Conta bancária excluída com sucesso!",
                     });
-                  },
-                  onError: () => {
-                    close();
+                  } else {
                     showAlert({
                       type: "error",
                       title: "Erro",
-                      description: "Erro ao excluir conta. Tente novamente.",
+                      description: res.message || "Erro ao excluir conta.",
                     });
-                  },
+                  }
                 }
-              )
-            }
-            loading={deleteAccount.isPending}
+              );
+            }}
           >
             Excluir
           </Button>
-          <Button
-            variant="outline"
-            onClick={close}
-            disabled={deleteAccount.isPending}
-          >
+          <Button variant="outline" onClick={close}>
             Cancelar
           </Button>
         </div>

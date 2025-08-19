@@ -1,22 +1,20 @@
 "use client";
-import { usePix, useDeletePix } from "@/features/finance/hooks/usePix";
+import { usePix, useInvalidatePix } from "@/features/finance/hooks/usePix";
 import { Button, Text } from "@/components";
 import { useModal } from "@/components/providers/ModalProvider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
 import { useAuthStore } from "@/lib/stores/authStore";
+import { deletePixAction } from "@/features/finance/actions";
 
 export function PixList() {
   const storeProducerId = useAuthStore((s) => s.producer?.id);
   const effectiveProducerId = Number(storeProducerId ?? 0);
   const { data, isLoading, error } = usePix(effectiveProducerId);
-  const deletePix = useDeletePix();
   const { showAlert, open, close } = useModal();
+  const { invalidatePix } = useInvalidatePix();
 
   function confirmDelete(pixId: string, label: string) {
-    // Primeiro, ainda usamos o modal customizado para confirmação (pois tem dois botões)
-    // Mas vamos usar showAlert para sucesso e erro
-
     open(
       <div>
         <Text
@@ -36,39 +34,35 @@ export function PixList() {
         <div className="flex items-center justify-center gap-3">
           <Button
             variant="primary"
-            onClick={() =>
-              deletePix.mutate(
-                { producerId: String(effectiveProducerId), pixId },
-                {
-                  onSuccess: () => {
-                    close();
+            onClick={() => {
+              const fd = new FormData();
+              fd.set("producerId", String(effectiveProducerId));
+              fd.set("pixId", String(pixId));
+              deletePixAction({ message: "", success: false }, fd).then(
+                (res) => {
+                  close();
+                  if (res.success) {
+                    // Invalidar o cache para atualizar a lista
+                    invalidatePix(effectiveProducerId);
                     showAlert({
                       type: "success",
                       title: "Sucesso!",
                       description: "Chave PIX excluída com sucesso!",
                     });
-                  },
-                  onError: () => {
-                    close();
+                  } else {
                     showAlert({
                       type: "error",
                       title: "Erro",
-                      description:
-                        "Erro ao excluir chave PIX. Tente novamente.",
+                      description: res.message || "Erro ao excluir chave PIX.",
                     });
-                  },
+                  }
                 }
-              )
-            }
-            loading={deletePix.isPending}
+              );
+            }}
           >
             Excluir
           </Button>
-          <Button
-            variant="outline"
-            onClick={close}
-            disabled={deletePix.isPending}
-          >
+          <Button variant="outline" onClick={close}>
             Cancelar
           </Button>
         </div>

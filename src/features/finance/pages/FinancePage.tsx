@@ -11,6 +11,8 @@ import { PixAdd } from "@/features/finance/components/PixAdd";
 import { PixList } from "@/features/finance/components/PixList";
 import { CreateAccountForm } from "@/features/finance/components/CreateAccountForm";
 import { AccountsList } from "@/features/finance/components/AccountsList";
+import { Coupons } from "@/features/finance/components/Coupons";
+import { Promoters } from "@/features/finance/components/Promoters";
 import { Text, ButtonBack } from "@/components";
 
 export function FinancePage() {
@@ -19,7 +21,6 @@ export function FinancePage() {
       <ScreenNavigator
         initial="home"
         render={(screen, navigate, goBack) => {
-          const eventId = undefined;
           if (screen === "home") {
             return (
               <div className="space-y-8">
@@ -33,7 +34,7 @@ export function FinancePage() {
                     Financeiro
                   </Text>
                 </div>
-                <ReceiptResumeCards eventId={eventId} />
+                <ReceiptResumeCards />
                 <FinanceActions
                   onNavigate={(s: FinanceScreenId) =>
                     navigate(
@@ -49,8 +50,8 @@ export function FinancePage() {
                     )
                   }
                 />
-                <div className="bg-white rounded-[20px] shadow">
-                  <PaymentMethodsChart eventId={eventId} />
+                <div className="bg-white rounded-[20px] shadow mb-6">
+                  <PaymentMethodsChart />
                 </div>
               </div>
             );
@@ -71,7 +72,7 @@ export function FinancePage() {
                 >
                   Movimentações
                 </Text>
-                <ReceiptsList eventId={eventId} />
+                <ReceiptsList />
               </div>
             );
           }
@@ -161,18 +162,84 @@ export function FinancePage() {
             return (
               <div className="space-y-6">
                 <ButtonBack
-                  label="Voltar"
+                  label="Contas bancárias"
                   sizeLabel="16-20-24"
                   onClick={goBack}
                 />
-                <div className="grid grid-cols-1">
-                  <div>
-                    <h3 className="text-xl font-semibold mb-4">
-                      Contas cadastradas
-                    </h3>
-                    <AccountsList />
-                  </div>
+                <AccountsList />
+                <FinanceActions
+                  onNavigate={(s: FinanceScreenId) =>
+                    navigate(
+                      s as unknown as
+                        | "home"
+                        | "details"
+                        | "pix-create"
+                        | "pix-list"
+                        | "account-create"
+                        | "account-list"
+                        | "coupons"
+                        | "promoters"
+                    )
+                  }
+                />
+              </div>
+            );
+          }
+          if (screen === "coupons") {
+            return (
+              <div>
+                <ButtonBack
+                  label="Cupons"
+                  sizeLabel="16-20-24"
+                  onClick={goBack}
+                />
+                <div className="mt-6">
+                  <Coupons />
                 </div>
+                <FinanceActions
+                  onNavigate={(s: FinanceScreenId) =>
+                    navigate(
+                      s as unknown as
+                        | "home"
+                        | "details"
+                        | "pix-create"
+                        | "pix-list"
+                        | "account-create"
+                        | "account-list"
+                        | "coupons"
+                        | "promoters"
+                    )
+                  }
+                />
+              </div>
+            );
+          }
+          if (screen === "promoters") {
+            return (
+              <div>
+                <ButtonBack
+                  label="Promoters"
+                  sizeLabel="16-20-24"
+                  onClick={goBack}
+                />
+                <div className="mt-6">
+                  <Promoters />
+                </div>
+                <FinanceActions
+                  onNavigate={(s: FinanceScreenId) =>
+                    navigate(
+                      s as unknown as
+                        | "home"
+                        | "details"
+                        | "pix-create"
+                        | "pix-list"
+                        | "account-create"
+                        | "account-list"
+                        | "coupons"
+                        | "promoters"
+                    )
+                  }
+                />
               </div>
             );
           }

@@ -2,12 +2,8 @@
 import { useReceipts } from "@/features/finance/hooks/useReceipts";
 import { Button, Text } from "@/components";
 
-export function ReceiptsList({
-  eventId,
-}: {
-  eventId?: string | number | null;
-}) {
-  const { data, isLoading, error } = useReceipts(eventId);
+export function ReceiptsList() {
+  const { data, isLoading, error } = useReceipts();
 
   if (isLoading) {
     return (

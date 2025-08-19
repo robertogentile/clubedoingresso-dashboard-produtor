@@ -38,7 +38,7 @@ interface FormState {
   success: boolean;
 }
 
-export function CreateAccountForm(/*{ producerId }: { producerId: number }*/) {
+export function CreateAccountForm() {
   const initialState: FormState = {
     message: "",
     errors: {},

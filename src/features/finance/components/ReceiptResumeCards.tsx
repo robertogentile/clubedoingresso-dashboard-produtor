@@ -4,12 +4,8 @@ import { Text } from "@/components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDollarSign, faTicket } from "@fortawesome/free-solid-svg-icons";
 
-export function ReceiptResumeCards({
-  eventId,
-}: {
-  eventId?: string | number | null;
-}) {
-  const { data, isLoading, error } = useReceiptResume(eventId);
+export function ReceiptResumeCards() {
+  const { data, isLoading, error } = useReceiptResume();
 
   if (isLoading)
     return (

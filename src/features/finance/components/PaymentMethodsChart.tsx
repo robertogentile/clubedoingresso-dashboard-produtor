@@ -15,12 +15,8 @@ const PALETTE = [
   "#fc8888", // secondary pink (last to reduce chance of adjacent duplication)
 ];
 
-export function PaymentMethodsChart({
-  eventId,
-}: {
-  eventId?: string | number | null;
-}) {
-  const { data, isLoading, error } = usePaymentMethodsResume(eventId);
+export function PaymentMethodsChart() {
+  const { data, isLoading, error } = usePaymentMethodsResume();
 
   const sorted = [...(data ?? [])].sort(
     (a, b) => (b.total ?? 0) - (a.total ?? 0)

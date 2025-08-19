@@ -67,24 +67,24 @@ export function FinanceActions({
         onClick={() => onNavigate("pix-create")}
       />
       <ActionButton
-        label="Cadastrar conta"
-        icon={faBuildingColumns}
-        onClick={() => onNavigate("account-create")}
-      />
-      <ActionButton
-        label="Cupons de desconto"
-        icon={faTicket}
-        onClick={() => onNavigate("coupons")}
-      />
-      <ActionButton
         label="Consultar/ excluir PIX"
         icon={faPix}
         onClick={() => onNavigate("pix-list")}
       />
       <ActionButton
+        label="Cadastrar conta"
+        icon={faBuildingColumns}
+        onClick={() => onNavigate("account-create")}
+      />
+      <ActionButton
         label="Consultar/ excluir conta"
         icon={faBuildingColumns}
         onClick={() => onNavigate("account-list")}
+      />
+      <ActionButton
+        label="Cupons de desconto"
+        icon={faTicket}
+        onClick={() => onNavigate("coupons")}
       />
       <ActionButton
         label="Promoters"

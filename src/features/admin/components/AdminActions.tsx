@@ -7,6 +7,7 @@ import {
   faGift,
   faChartBar,
   faLock,
+  faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
 
 export type AdminScreenId =
@@ -29,7 +30,8 @@ export function AdminActions({
       <Text size="24-28-34" weight="700" color="primary" className="mb-2">
         Administração
       </Text>
-      <div className="grid justify-evenly md:justify-start grid-cols-[repeat(2,max-content)] md:grid-cols-[repeat(6,max-content)] gap-4 w-full">
+
+      <div className="grid justify-evenly md:justify-between grid-cols-[repeat(2,max-content)] md:grid-cols-[repeat(4,max-content)] xl:grid-cols-[repeat(7,max-content)] gap-y-4 w-full">
         <ActionButton
           label="Cadastrar link de promoter"
           icon={faUsers}
@@ -54,6 +56,11 @@ export function AdminActions({
           label="Pixel Meta Facebook e Instagram"
           icon={faChartBar}
           onClick={() => onNavigate("meta")}
+        />
+        <ActionButton
+          label="Google Analytics e ADs"
+          icon={faChartLine}
+          onClick={() => onNavigate("analytics")}
         />
         <ActionButton
           label="Encerrar venda do evento"

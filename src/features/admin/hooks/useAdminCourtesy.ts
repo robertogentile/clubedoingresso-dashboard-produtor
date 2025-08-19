@@ -12,7 +12,7 @@ export function useAdminCourtesyBatches(eventId?: string | number | null) {
       const res = await fetchJson<{
         success: boolean;
         data: AdminCourtesyBatchItem[];
-      }>(`/api/admin/courtesy-batches${query}`);
+      }>(`/api/admin/batches-courtesy${query}`);
       return res.data ?? [];
     },
     retry: 1,
